@@ -80,7 +80,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void сreateValidFilmTest() throws ValidationException {
+    public void createValidFilmTest() throws ValidationException {
         assertEquals(filmController.create(validFilm), validFilm);
     }
 
