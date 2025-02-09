@@ -95,7 +95,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void сreatedUserTest() throws ValidationException, DuplicateException {
+    public void createdUserTest() throws ValidationException, DuplicateException {
         assertEquals(userController.create(user2), user2);
     }
 
