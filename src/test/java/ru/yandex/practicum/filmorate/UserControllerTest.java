@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.impl.InMemoryUserServiceImpl;
 
 import java.time.LocalDate;
 
@@ -27,7 +28,7 @@ class UserControllerTest {
 
     @BeforeAll
     public static void start() throws ValidationException, DuplicateException {
-        userController = new UserController(new UserService());
+        userController = new UserController(new InMemoryUserServiceImpl());
 
         // Тут все ок
         user1 = User.builder()
