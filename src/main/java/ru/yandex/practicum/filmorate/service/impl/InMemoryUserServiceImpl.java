@@ -18,7 +18,6 @@ import java.util.Map;
 @Service
 @Slf4j
 public class InMemoryUserServiceImpl implements UserService {
-
     private final Map<Long, User> users = new HashMap<>();
 
     @Override
@@ -26,6 +25,7 @@ public class InMemoryUserServiceImpl implements UserService {
         log.info("Получение списка всех Пользователей");
         return users.values();
     }
+
     @Override
     public User create(@Valid User user) {
         log.info("Создание пользователя {}", user);

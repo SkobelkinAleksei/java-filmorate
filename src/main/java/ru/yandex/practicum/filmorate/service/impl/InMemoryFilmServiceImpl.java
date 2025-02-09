@@ -17,7 +17,6 @@ import java.util.Map;
 @Service
 @Slf4j
 public class InMemoryFilmServiceImpl implements FilmService {
-
     private static final Map<Long, Film> films = new HashMap<>();
 
     @Override
