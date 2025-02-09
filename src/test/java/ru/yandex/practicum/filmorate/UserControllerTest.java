@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +23,6 @@ class UserControllerTest {
     private static User user4;
     private static User user5;
     private static User user6;
-    private static User user7;
     private static User user8;
 
     @BeforeAll
@@ -32,33 +30,68 @@ class UserControllerTest {
         userController = new UserController(new UserService());
 
         // Тут все ок
-        user1 = User.of(0L, "name1", "name1@mail.ru",
-                "name111@mail", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        user1 = User.builder()
+                .id(0L)
+                .name("name1")
+                .email("name1@mail.ru")
+                .login("name1")
+                .birthday(LocalDate.of(2020, 05, 19))
+                .build();
         userController.create(user1);
 
-        user2 = User.of(0L, "name2", "name2@mail.ru",
-                "name2", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+        user2 = User.builder()
+                .id(0L)
+                .name("name2")
+                .email("name2@mail.ru")
+                .login("name2")
+                .birthday(LocalDate.of(2020, 05, 19))
+                .build();
 
         // Неправильная почта
-        user3 = User.of(0L, "name3", "name3mail.ru",
-                "name3", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        user3 = User.builder()
+                .id(0L)
+                .name("name3")
+                .email("name3mail.ru")
+                .login("name3")
+                .birthday(LocalDate.of(2020, 05, 19))
+                .build();
 
         // Задублировал почту
-        user4 = User.of(0L, "name4", "name1@mail.ru",
-                "name4", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        user4 = User.builder()
+                .id(0L)
+                .name("name4")
+                .email("name1@mail.ru")
+                .login("name4")
+                .birthday(LocalDate.of(2020, 05, 19))
+                .build();
 
         // Неправильный логин
-        user5 = User.of(0L, "name5", "name5@mail.ru",
-                " ", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        user5 = User.builder()
+                .id(0L)
+                .name("name5")
+                .email("name5@mail.ru")
+                .login(" ")
+                .birthday(LocalDate.of(2020, 05, 19))
+                .build();
 
         // Неправильная дата ДР
-        user6 = User.of(0L, "name6", "name6@mail.ru",
-                "name6", LocalDate.parse("2028-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        user6 = User.builder()
+                .id(0L)
+                .name("name6")
+                .email("name6@mail.ru")
+                .login("name6")
+                .birthday(LocalDate.of(2028, 05, 19))
+                .build();
 
         // Такого ID нету
-        user8 = User.of(11L, "name8", "name8@mail.ru",
-                "name8", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-
+        user8 = User.builder()
+                .id(11L)
+                .name("name8")
+                .email("name8@mail.ru")
+                .login("name8")
+                .birthday(LocalDate.of(2020, 05, 19))
+                .build();
     }
 
     @Test
