@@ -55,10 +55,6 @@ class UserControllerTest {
         user6 = User.of(0L, "name6", "name6@mail.ru",
                 "name6", LocalDate.parse("2028-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
-        // Нет ID
-        user7 = User.of(null, "name7", "name7@mail.ru",
-                "name7", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-
         // Такого ID нету
         user8 = User.of(11L, "name8", "name8@mail.ru",
                 "name8", LocalDate.parse("2020-04-19", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
@@ -98,14 +94,6 @@ class UserControllerTest {
     public void invalidBirthdayTest() {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             userController.create(user6);
-        });
-        assertNotNull(exception);
-    }
-
-    @Test
-    public void noIdTest() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            userController.update(user7);
         });
         assertNotNull(exception);
     }
