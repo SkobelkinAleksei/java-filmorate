@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @Component
-public class UserValidHelper implements UserValidMethods{
+public class UserValidHelper implements UserValidMethods {
     private final LogAndThrowHelper logHelper;
 
     @Override

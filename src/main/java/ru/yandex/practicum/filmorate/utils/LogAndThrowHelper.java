@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class LogAndThrowHelper implements LogAndThrowMethods{
+public class LogAndThrowHelper implements LogAndThrowMethods {
 
     @Override
     public void logAndThrow(RuntimeException exception) {
