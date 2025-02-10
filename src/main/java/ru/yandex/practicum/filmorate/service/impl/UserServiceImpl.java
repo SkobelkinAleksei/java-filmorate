@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
@@ -9,16 +10,20 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
+import ru.yandex.practicum.filmorate.utils.UserValidHelper;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
-public class InMemoryUserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
     private final Map<Long, User> users = new HashMap<>();
+    private final LogAndThrowHelper logHelper;
+    private final UserValidHelper userHelper;
 
     @Override
     public Collection<User> findAll() {
@@ -31,13 +36,13 @@ public class InMemoryUserServiceImpl implements UserService {
         log.info("Создание пользователя {}", user);
 
         duplMailCheck(user);
-        validateEmail(user.getEmail());
-        validateLogin(user.getLogin());
+        userHelper.validateEmail(user.getEmail());
+        userHelper.validateLogin(user.getLogin());
 
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        validateBirthday(user.getBirthday());
+        userHelper.validateBirthday(user.getBirthday());
 
         // Тут дали Пользователю уникальный id
         user.setId(getNextId());
@@ -61,7 +66,7 @@ public class InMemoryUserServiceImpl implements UserService {
     public void duplMailCheck(User user) {
         for (User us : users.values()) {
             if (us.getEmail().equals(user.getEmail())) {
-                logAndThrow(new DuplicateException(ExceptionMessages.EMAIL_ALREADY_EXISTS));
+                logHelper.logAndThrow(new DuplicateException(ExceptionMessages.EMAIL_ALREADY_EXISTS));
             }
         }
     }
@@ -84,39 +89,8 @@ public class InMemoryUserServiceImpl implements UserService {
             oldUser.setBirthday(newUser.getBirthday());
             return oldUser;
         } else {
-            logAndThrow(new NotFoundException("Пользователь с id = " + newUser.getId() + " не может быть найден"));
+            logHelper.logAndThrow(new NotFoundException("Пользователь с id = " + newUser.getId() + " не может быть найден"));
         }
         return null;
-    }
-
-    @Override
-    public void validateEmail(String email) {
-        if (email == null || email.isBlank() || !email.contains("@") || email.contains(" ")) {
-            logAndThrow(new ValidationException(ExceptionMessages.EMAIL_CANNOT_BE_EMPTY));
-        }
-    }
-
-    @Override
-    public void validateLogin(String login) {
-        if (login == null || login.contains(" ") || login.isEmpty()) {
-            logAndThrow(new ValidationException(ExceptionMessages.LOGIN_CANNOT_BE_EMPTY));
-        }
-    }
-
-    @Override
-    public void validateBirthday(LocalDate birthday) {
-        if (birthday != null) {
-            if (birthday.isAfter(LocalDate.now())) {
-                logAndThrow(new ValidationException(ExceptionMessages.BIRTHDAY_CANNOT_BE_IN_FUTURE));
-            }
-        } else {
-            logAndThrow(new ValidationException(ExceptionMessages.BIRTHDAY_CANNOT_BE_NULL));
-        }
-    }
-
-    @Override
-    public void logAndThrow(RuntimeException exception) {
-        log.error(exception.getMessage());
-        throw exception;
     }
 }

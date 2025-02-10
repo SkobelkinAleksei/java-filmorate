@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.service.impl.InMemoryFilmServiceImpl;
+import ru.yandex.practicum.filmorate.service.impl.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
+import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +28,7 @@ public class FilmControllerTest {
 
     @BeforeAll
     public static void start() throws ValidationException {
-        filmController = new FilmController(new InMemoryFilmServiceImpl());
+        filmController = new FilmController(new FilmServiceImpl(new FilmValidHelper(new LogAndThrowHelper())));
 
         validFilm = Film.builder()
             .id(0L)
