@@ -15,7 +15,6 @@ import java.util.Collection;
 @AllArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-
     private final FilmService filmService;
 
     // Получение всех фильмов.

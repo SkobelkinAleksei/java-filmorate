@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(@Valid User newUser) {
-
         log.info("Обновление пользователя с ID: {}", newUser.getId());
 
         if (newUser.getId() == null) {

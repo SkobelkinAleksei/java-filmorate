@@ -10,10 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
-import ru.yandex.practicum.filmorate.utils.FilmValidMethods;
-import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

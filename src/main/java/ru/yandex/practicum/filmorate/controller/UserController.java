@@ -17,9 +17,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-
     private final UserService userService;
-
 
     // Получение всех Пользователей.
     @GetMapping
