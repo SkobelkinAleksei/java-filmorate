@@ -1,26 +1,26 @@
-package ru.yandex.practicum.filmorate.service.impl;
+package ru.yandex.practicum.filmorate.storage.user;
 
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.ExceptionMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
 import ru.yandex.practicum.filmorate.utils.UserValidHelper;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Component
+@Data
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private final LogAndThrowHelper logHelper;
     private final UserValidHelper userHelper;
@@ -29,6 +29,18 @@ public class UserServiceImpl implements UserService {
     public Collection<User> findAll() {
         log.info("Получение списка всех Пользователей");
         return users.values();
+    }
+
+    @Override
+    public User getUser(long userId) {
+        log.info("Получение конкретного User по id");
+        User user = users.get(userId);
+
+        if (user == null) {
+            logHelper.logAndThrow(new NotFoundException(ExceptionMessages.USER_NOT_FOUND));
+        }
+
+        return user;
     }
 
     @Override
@@ -91,5 +103,60 @@ public class UserServiceImpl implements UserService {
             logHelper.logAndThrow(new NotFoundException("Пользователь с id = " + newUser.getId() + " не может быть найден"));
         }
         return null;
+    }
+
+    @Override
+    public Set<User> getFriends(long userId) {
+        log.info("Получаем всех друзей у User по его ID");
+        // Получаем пользователя по userId
+        User user = users.get(userId);
+
+        // Получаем множество ID друзей и конвертируем их в пользователей
+        return user.getFriendIds()
+                .stream()
+                .map(friendId -> users.get(friendId))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void addFriend(long userId, long friendId) {
+        log.info("Добавляем User нового друга");
+        users.get(userId)
+                .getFriendIds()
+                .add(friendId);
+
+        log.info("Добавляем Новому другу в друзья User");
+        users.get(friendId)
+                .getFriendIds()
+                .add(userId);
+
+        log.info("Друг был успешно добавлен");
+    }
+
+    @Override
+    public void removeFriend(long userId, long friendId) {
+        log.info("Удаляем у User друга по ID");
+        users.get(userId)
+                .getFriendIds()
+                .remove(friendId);
+
+        log.info("Удаляем у Друга user по ID");
+        users.get(friendId)
+                .getFriendIds()
+                .remove(userId);
+    }
+
+    @Override
+    public Set<User> getMutualFriends(User user1, User user2) {
+        log.info("Получаем общих друзей у user1 и user2");
+
+        // Получаем пересечение ID друзей обоих пользователей
+        Set<Long> mutualFriendIds = new HashSet<>(user1.getFriendIds());  // Копируем ID друзей user1
+        mutualFriendIds.retainAll(user2.getFriendIds());  // Оставляем только те, что есть и у user2
+
+        // Получаем самих пользователей по ID и собираем в Set
+        return mutualFriendIds.stream()
+                .map(userId -> users.get(userId))  // Преобразуем ID в User
+                .collect(Collectors.toSet());  // Собираем в Set
     }
 }

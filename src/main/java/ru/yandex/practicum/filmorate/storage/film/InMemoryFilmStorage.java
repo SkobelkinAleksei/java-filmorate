@@ -1,31 +1,68 @@
-package ru.yandex.practicum.filmorate.service.impl;
+package ru.yandex.practicum.filmorate.storage.film;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ExceptionMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Service
+@Component
 @Slf4j
-public class FilmServiceImpl implements FilmService {
+public class InMemoryFilmStorage implements FilmStorage {
     private static final Map<Long, Film> films = new HashMap<>();
     private final FilmValidHelper filmHelper;
 
     @Override
-    public Collection<Film> getFilms() {
+    public Collection<Film> findAll() {
         log.info("Получение списка всех фильмов");
         return films.values();
+    }
+
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        log.info("Добавляем лайк фильму");
+        films.get(filmId)
+                .getUserLikes()
+                .add(userId);
+    }
+
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        log.info("Удаляем лайк у фильма");
+        films.get(filmId)
+                .getUserLikes()
+                .remove(userId);
+    }
+
+    @Override
+    public Collection<Film> getTopMovies() {
+        log.info("Собираем фильмы ТОП-10");
+        return films.values()
+                .stream()
+                .sorted((film1, film2) -> Integer.compare(film2.getUserLikes().size(), film2.getUserLikes().size()))
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Film getfilm(Long filmId) {
+        Film film = films.get(filmId);
+
+        if (film == null) {
+            throw new NotFoundException(ExceptionMessages.FILM_NOT_FOUND);
+        }
+
+        return film;
     }
 
     // Добавляем фильм

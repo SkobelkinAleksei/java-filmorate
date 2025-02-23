@@ -7,6 +7,7 @@ public class ExceptionMessages {
     public static final String LOGIN_CANNOT_BE_EMPTY = "Логин не может быть пуст и не должен содержать пробелы";
     public static final String BIRTHDAY_CANNOT_BE_IN_FUTURE = "Дата рождения не может быть в будущем времени";
     public static final String BIRTHDAY_CANNOT_BE_NULL = "Дата рождения не может быть пустой";
+    public static final String USER_NOT_FOUND = "Пользователь null";
 
     //ValidationException фильмы
     public static final String FILM_NAME_CANNOT_BE_EMPTY = "Название фильма должно быть указано";

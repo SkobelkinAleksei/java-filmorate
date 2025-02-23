@@ -19,8 +19,14 @@ public class FilmController {
 
     // Получение всех фильмов.
     @GetMapping
-    public Collection<Film> getFilms() {
-        return filmService.getFilms();
+    public Collection<Film> findAll() {
+        return filmService.findAll();
+    }
+
+    // Получение фильма
+    @GetMapping("/films/{id}")
+    public Film getFilmById(@PathVariable long id) {
+        return filmService.getfilm(id);
     }
 
     // Добавляем фильм
@@ -34,5 +40,24 @@ public class FilmController {
     @PutMapping
     public Film update(@Valid @RequestBody Film newFilm) {
         return filmService.update(newFilm);
+    }
+
+    // Ставим лайк фильму
+    @PutMapping("/films/{id}/like/{userId}")
+    public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        filmService.addLike(filmId, userId);
+    }
+
+    //  пользователь удаляет лайк
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/films/{id}/like/{userId}")
+    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        filmService.removeLike(filmId, userId);
+    }
+
+    // Возвращает список из первых 10-и
+    @GetMapping("/films/popular")
+    public Collection<Film> getTopMovies() {
+        return filmService.getTopMovies();
     }
 }
