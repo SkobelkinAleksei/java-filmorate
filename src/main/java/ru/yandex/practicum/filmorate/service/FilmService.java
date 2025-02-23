@@ -30,8 +30,8 @@ public class FilmService {
         return filmStorage.getTopMovies();
     }
 
-    public Film getfilm(Long filmId) {
-        return filmStorage.getfilm(filmId);
+    public Film getFilm(Long filmId) {
+        return filmStorage.getFilm(filmId);
     }
 
     public Film createFilm(Film film) {

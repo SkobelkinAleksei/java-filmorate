@@ -15,7 +15,7 @@ public class ExceptionMessages {
     public static final String FILM_DESCRIPTION_TOO_LONG = "Описание фильма пустое или превышает 200 символов";
     public static final String FILM_RELEASE_DATE_IS_INCORRECT = "Дата релиза фильма не может быть раньше 28.12.1895г.";
     public static final String FILM_ID_CANNOT_BE_NULL = "ID фильма не может быть null";
-    public static final String FILM_NOT_FOUND = "Фильм с id %d не удалось найти";
+    public static final String FILM_NOT_FOUND = "Фильм с id не удалось найти";
 
     //текс для DuplicatedDataException
     public static final String EMAIL_ALREADY_EXISTS = "Этот емейл уже используется";

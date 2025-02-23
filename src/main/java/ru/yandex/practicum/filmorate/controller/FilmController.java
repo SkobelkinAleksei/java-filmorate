@@ -24,9 +24,9 @@ public class FilmController {
     }
 
     // Получение фильма
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     public Film getFilmById(@PathVariable long id) {
-        return filmService.getfilm(id);
+        return filmService.getFilm(id);
     }
 
     // Добавляем фильм
@@ -43,20 +43,20 @@ public class FilmController {
     }
 
     // Ставим лайк фильму
-    @PutMapping("/films/{id}/like/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
         filmService.addLike(filmId, userId);
     }
 
     //  пользователь удаляет лайк
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/films/{id}/like/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
         filmService.removeLike(filmId, userId);
     }
 
     // Возвращает список из первых 10-и
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     public Collection<Film> getTopMovies() {
         return filmService.getTopMovies();
     }

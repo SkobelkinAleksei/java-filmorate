@@ -29,19 +29,19 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(Long filmId, Long userId) {
+    public void addLike(Long filmId, Long userId) throws NotFoundException {
         log.info("Добавляем лайк фильму");
-        films.get(filmId)
-                .getUserLikes()
-                .add(userId);
+        Film film = getFilm(filmId);
+        film.getUserLikes().add(userId);
+        log.info("Добавили лайк фильму");
     }
 
     @Override
     public void removeLike(Long filmId, Long userId) {
         log.info("Удаляем лайк у фильма");
-        films.get(filmId)
-                .getUserLikes()
-                .remove(userId);
+        Film film = getFilm(filmId);
+        film.getUserLikes().remove(userId);
+        log.info("Лайк успешно удален");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getfilm(Long filmId) {
+    public Film getFilm(Long filmId) {
         Film film = films.get(filmId);
 
         if (film == null) {

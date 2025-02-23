@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -26,5 +27,5 @@ public class Film {
     @NotNull(message = "Продолжительность фильма не может быть пуста или null")
     private int duration;
 
-    private Set<Long> userLikes;
+    private Set<Long> userLikes = new HashSet<>();
 }

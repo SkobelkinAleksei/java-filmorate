@@ -15,7 +15,7 @@ public interface FilmStorage {
 
     Collection<Film> getTopMovies();
 
-    Film getfilm(Long filmId);
+    Film getFilm(Long filmId);
 
     Film createFilm(Film film) throws ValidationException;
 
