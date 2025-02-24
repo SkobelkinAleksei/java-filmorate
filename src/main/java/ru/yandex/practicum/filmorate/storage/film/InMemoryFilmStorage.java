@@ -32,12 +32,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void addLike(Long filmId, Long userId) {
         log.info("Добавляем лайк фильму с ID: {}", filmId);
         Film film = getFilm(filmId);
+
         if (film == null) {
             log.error("Фильм не найден: {}", filmId);
         }
+
         if (film.getUserLikes() == null) {
             log.error("userLikes у фильма {} равен null", filmId);
         }
+
         film.getUserLikes().add(userId);
         log.info("Добавили лайк фильму {}", filmId);
     }
