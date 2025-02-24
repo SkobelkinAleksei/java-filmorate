@@ -38,7 +38,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film == null) {
             log.error("Фильм не найден: {}", filmId);
             logHelper.logAndThrow(new NullPointerException("Film == null"));
-        } else if (film.getUserLikes() == null) {
+        }else if (film.getUserLikes() == null) {
             log.error("userLikes у фильма {} равен null", filmId);
             logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
         }
