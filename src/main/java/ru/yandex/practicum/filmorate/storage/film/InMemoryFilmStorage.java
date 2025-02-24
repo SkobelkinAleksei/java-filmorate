@@ -49,6 +49,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void removeLike(Long filmId, Long userId) {
         log.info("Удаляем лайк у фильма");
         Film film = getFilm(filmId);
+
+        if (film == null) {
+            log.error("При удалении лайка фильм не был найден: {}", filmId);
+        }
+
+        if (film.getUserLikes() == null) {
+            log.error("При удалении лайка  userLikes у фильма {} равен null", filmId);
+        }
+
         film.getUserLikes().remove(userId);
         log.info("Пользователь с ID = {} забрал лайк с фильма с ID = {}", userId, filmId);
     }
