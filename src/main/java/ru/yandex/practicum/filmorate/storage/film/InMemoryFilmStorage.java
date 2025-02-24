@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -32,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void addLike(Long filmId, Long userId) {
         log.info("Добавляем лайк фильму с ID: {}", filmId);
-        Film film = films.get(filmId);
+        Film film = getFilm(filmId);
         if (film == null) {
             log.error("Фильм не найден: {}", filmId);
         }
