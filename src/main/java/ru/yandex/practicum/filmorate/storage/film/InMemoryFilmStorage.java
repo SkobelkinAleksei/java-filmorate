@@ -43,6 +43,10 @@ public class InMemoryFilmStorage implements FilmStorage {
             logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
         }
 
+        if (!film.getUserLikes().contains(userId)) {
+            logHelper.logAndThrow(new NullPointerException("userId некорректный: " + userId));
+        }
+
         film.getUserLikes().add(userId);
         log.info("Добавили лайк фильму {}", film.getUserLikes());
     }
@@ -58,6 +62,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else if (film.getUserLikes() == null) {
             log.error("При удалении лайка  userLikes у фильма {} равен null", filmId);
             logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
+        }
+
+        if (!film.getUserLikes().contains(userId)) {
+            logHelper.logAndThrow(new NullPointerException("userId некорректный: " + userId));
         }
 
         film.getUserLikes().remove(userId);

@@ -56,7 +56,7 @@ public class UserController {
     // Удаление из друзей
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public void removeFriend(@Valid @PathVariable long userId, @PathVariable long friendId) {
+    public void removeFriend(@PathVariable long userId, @PathVariable long friendId) {
         userService.removeFriend(userId, friendId);
     }
 

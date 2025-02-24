@@ -33,7 +33,7 @@ public class FilmController {
     // Добавляем фильм
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@Valid @RequestBody Film film) {
+    public Film create(@RequestBody Film film) {
         return filmService.createFilm(film);
     }
 
