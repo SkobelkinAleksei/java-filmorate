@@ -58,12 +58,12 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .stream()
                 .sorted((film1, film2) -> Integer.compare(film2.getUserLikes().size(), film1.getUserLikes().size()))
                 .limit(10)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public Film getFilm(Long filmId) {
-        log.info("Берем фильм по ID");
+        log.info("Берем фильм по ID {}", filmId);
         Film film = films.get(filmId);
 
         log.info("Фильм {}", film);

@@ -43,14 +43,14 @@ public class FilmController {
     }
 
     // Ставим лайк фильму
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping("/{filmId}/like/{userId}")
     public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
         filmService.addLike(filmId, userId);
     }
 
     //  пользователь удаляет лайк
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
         filmService.removeLike(filmId, userId);
     }
