@@ -19,4 +19,8 @@ public class ExceptionMessages {
 
     //текс для DuplicatedDataException
     public static final String EMAIL_ALREADY_EXISTS = "Этот емейл уже используется";
+
+    //
+    public static final String NO_FRIEND = "Не являются друзьями";
+
 }

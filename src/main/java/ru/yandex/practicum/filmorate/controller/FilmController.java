@@ -52,7 +52,7 @@ public class FilmController {
     //  пользователь удаляет лайк
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{filmId}/like/{userId}")
-    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) throws NotFoundException {
+    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
         filmService.removeLike(filmId, userId);
     }
 

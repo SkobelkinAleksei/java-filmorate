@@ -156,7 +156,7 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = getUser(friendId);
 
         if (!user.getFriendIds().contains(friendId) && !friend.getFriendIds().contains(userId)) {
-            logHelper.logAndThrow(new NotFoundException("Пользователи не могут быть найдены как взаимные друзья"));
+            logHelper.logAndThrow(new NotFoundException(ExceptionMessages.NO_FRIEND));
         }
         if (userId == 0 || friendId == 0) {
             logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
