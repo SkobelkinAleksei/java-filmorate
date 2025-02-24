@@ -58,6 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         // Тут дали Пользователю уникальный id
         user.setId(getNextId());
+        user.setFriendIds(new HashSet<>());
         users.put(user.getId(), user);
         log.info("Создали успешно пользователя {}", user);
         return user;
