@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
+import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class InMemoryFilmStorage implements FilmStorage {
     private static final Map<Long, Film> films = new HashMap<>();
     private final FilmValidHelper filmHelper;
+    private final LogAndThrowHelper logHelper;
 
     @Override
     public Collection<Film> findAll() {
@@ -35,14 +37,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         if (film == null) {
             log.error("Фильм не найден: {}", filmId);
-        }
-
-        if (film.getUserLikes() == null) {
+            logHelper.logAndThrow(new NullPointerException("Film == null"));
+        } else if (film.getUserLikes() == null) {
             log.error("userLikes у фильма {} равен null", filmId);
+            logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
         }
 
         film.getUserLikes().add(userId);
-        log.info("Добавили лайк фильму {}", filmId);
+        log.info("Добавили лайк фильму {}", film.getUserLikes());
     }
 
     @Override
@@ -52,10 +54,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         if (film == null) {
             log.error("При удалении лайка фильм не был найден: {}", filmId);
-        }
-
-        if (film.getUserLikes() == null) {
+            logHelper.logAndThrow(new NullPointerException("Film == null"));
+        }else if (film.getUserLikes() == null) {
             log.error("При удалении лайка  userLikes у фильма {} равен null", filmId);
+            logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
         }
 
         film.getUserLikes().remove(userId);

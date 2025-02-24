@@ -31,7 +31,7 @@ public class FilmControllerTest {
     @BeforeAll
     public static void start() throws ValidationException {
         // Создаем экземпляр сервиса
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(new FilmValidHelper(new LogAndThrowHelper())));
+        FilmService filmService = new FilmService(new InMemoryFilmStorage(new FilmValidHelper(new LogAndThrowHelper()), new LogAndThrowHelper()));
 
         // Создаем контроллер, передавая ему сервис и хранилище
         filmController = new FilmController(filmService);
