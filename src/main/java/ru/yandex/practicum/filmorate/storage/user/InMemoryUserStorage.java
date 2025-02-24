@@ -152,6 +152,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void removeFriend(long userId, long friendId) {
+        User user = getUser(userId);
+        User friend = getUser(friendId);
+
+        if (!user.getFriendIds().contains(friendId) && !friend.getFriendIds().contains(userId)) {
+            logHelper.logAndThrow(new NotFoundException("Пользователи не могут быть найдены как взаимные друзья"));
+        }
         if (userId == 0 || friendId == 0) {
             logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
         }
@@ -163,6 +169,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (!users.containsKey(friendId)) {
             logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
         }
+
 
         log.info("Удаляем у User друга по ID");
         users.get(userId)
