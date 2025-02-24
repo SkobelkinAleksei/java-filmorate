@@ -112,6 +112,9 @@ public class InMemoryUserStorage implements UserStorage {
         // Получаем пользователя по userId
         User user = users.get(userId);
 
+        if (userId == 0 || !users.containsKey(userId)) {
+            logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
+        }
         // Получаем множество ID друзей и конвертируем их в пользователей
         return user.getFriendIds()
                 .stream()
@@ -121,10 +124,23 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void addFriend(long userId, long friendId) {
+        if (userId == 0 || friendId == 0) {
+            logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
+        }
+
+        if (!users.containsKey(userId)) {
+            logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
+        }
+
+        if (!users.containsKey(friendId)) {
+            logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
+        }
+
         log.info("Добавляем User нового друга");
         users.get(userId)
                 .getFriendIds()
                 .add(friendId);
+
 
         log.info("Добавляем Новому другу в друзья User");
         users.get(friendId)
@@ -136,6 +152,18 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void removeFriend(long userId, long friendId) {
+        if (userId == 0 || friendId == 0) {
+            logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
+        }
+
+        if (!users.containsKey(userId)) {
+            logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
+        }
+
+        if (!users.containsKey(friendId)) {
+            logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
+        }
+
         log.info("Удаляем у User друга по ID");
         users.get(userId)
                 .getFriendIds()
@@ -152,10 +180,13 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Получаем общих друзей у user1 и user2");
 
         // Получаем пересечение ID друзей обоих пользователей
+        log.info("Копируем ID друзей user1");
         Set<Long> mutualFriendIds = new HashSet<>(user1.getFriendIds());  // Копируем ID друзей user1
+        log.info("Оставляем только те, что есть и у user2");
         mutualFriendIds.retainAll(user2.getFriendIds());  // Оставляем только те, что есть и у user2
 
         // Получаем самих пользователей по ID и собираем в Set
+        log.info("Получаем самих пользователей по ID и собираем в Set");
         return mutualFriendIds.stream()
                 .map(userId -> users.get(userId))  // Преобразуем ID в User
                 .collect(Collectors.toSet());  // Собираем в Set

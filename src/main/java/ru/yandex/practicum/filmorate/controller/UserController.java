@@ -46,26 +46,26 @@ public class UserController {
     }
 
     // Добавление в друзья
-    @PutMapping("/{id}/friends/{friendId}")
+    @PutMapping("/{userId}/friends/{friendId}")
     public void addFriend(@PathVariable long userId, @PathVariable long friendId) {
         userService.addFriend(userId, friendId);
     }
 
     // Удаление из друзей
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}/friends/{friendId}")
+    @DeleteMapping("/{userId}/friends/{friendId}")
     public void removeFriend(@PathVariable long userId, @PathVariable long friendId) {
         userService.removeFriend(userId, friendId);
     }
 
     // Возвращаем друзей User
-    @GetMapping("/{id}/friends")
+    @GetMapping("/{userId}/friends")
     public Set<User> getFriends(@PathVariable long userId) {
         return userService.getFriends(userId);
     }
 
     // Список общих друзей
-    @GetMapping("/{id}/friends/common/{otherId}")
+    @GetMapping("/{user1}/friends/common/{user2}")
     public Set<User> getMutualFriends(@PathVariable User user1, @PathVariable User user2) {
         return userService.getMutualFriends(user1, user2);
     }

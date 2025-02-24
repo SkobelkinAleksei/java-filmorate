@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.ExceptionMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
 
 import java.util.Collection;
@@ -50,7 +51,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Удаляем лайк у фильма");
         Film film = getFilm(filmId);
         film.getUserLikes().remove(userId);
-        log.info("Лайк успешно удален");
+        log.info("Пользователь с ID = {} забрал лайк с фильма с ID = {}", userId, filmId);
     }
 
     @Override
