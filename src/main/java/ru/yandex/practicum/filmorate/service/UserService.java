@@ -45,7 +45,7 @@ public class UserService {
         userStorage.removeFriend(userId, friendId);
     }
 
-    public Set<User> getMutualFriends(User user1, User user2) {
+    public List<User> getMutualFriends(Long user1, Long user2) {
         return userStorage.getMutualFriends(user1, user2);
     }
 }

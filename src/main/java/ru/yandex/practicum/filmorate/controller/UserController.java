@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -66,7 +67,7 @@ public class UserController {
 
     // Список общих друзей
     @GetMapping("/{user1}/friends/common/{user2}")
-    public Set<User> getMutualFriends(@PathVariable User user1, @PathVariable User user2) {
+    public List<User> getMutualFriends(@PathVariable Long user1, @PathVariable Long user2) {
         return userService.getMutualFriends(user1, user2);
     }
 }

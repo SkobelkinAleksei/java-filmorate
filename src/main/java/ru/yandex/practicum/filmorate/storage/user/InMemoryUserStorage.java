@@ -176,19 +176,29 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Set<User> getMutualFriends(User user1, User user2) {
-        log.info("Получаем общих друзей у user1 и user2");
+    public List<User> getMutualFriends(Long user1, Long user2) {
+        log.info("Получаем пользователей по ID");
+        User userOne = users.get(user1);
+        User userTwo = users.get(user2);
 
-        // Получаем пересечение ID друзей обоих пользователей
-        log.info("Копируем ID друзей user1");
-        Set<Long> mutualFriendIds = new HashSet<>(user1.getFriendIds());  // Копируем ID друзей user1
-        log.info("Оставляем только те, что есть и у user2");
-        mutualFriendIds.retainAll(user2.getFriendIds());  // Оставляем только те, что есть и у user2
+        log.info("Проверяем, что не null");
+        if (userOne == null || userTwo == null) {
+            logHelper.logAndThrow(new NotFoundException("Один из пользователей не найден"));
+        }
 
-        // Получаем самих пользователей по ID и собираем в Set
-        log.info("Получаем самих пользователей по ID и собираем в Set");
-        return mutualFriendIds.stream()
-                .map(userId -> users.get(userId))  // Преобразуем ID в User
-                .collect(Collectors.toSet());  // Собираем в Set
+        log.info("Закидываем все id в Set, а дальше преобразуем в список");
+        Set<Long> commonFriendsIds = new HashSet<>(userOne.getFriendIds());
+        commonFriendsIds.retainAll(userTwo.getFriendIds());
+
+        log.info("Преобразуем в список");
+        List<User> commonFriends = new ArrayList<>();
+        for (Long friendId : commonFriendsIds) {
+            User friend = users.get(friendId); // Получаем пользователя по ID
+            if (friend != null) { // Проверяем, существует ли такой пользователь
+                commonFriends.add(friend);
+            }
+        }
+
+        return commonFriends;
     }
 }
