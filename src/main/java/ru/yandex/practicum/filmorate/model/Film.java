@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -27,5 +29,6 @@ public class Film {
     @NotNull(message = "Продолжительность фильма не может быть пуста или null")
     private int duration;
 
+    @Builder.Default
     private Set<Long> userLikes = new HashSet<>();
 }
