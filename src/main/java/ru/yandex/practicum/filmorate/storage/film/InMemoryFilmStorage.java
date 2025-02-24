@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void addLike(Long filmId, Long userId) {
         log.info("Добавляем лайк фильму с ID: {}", filmId);
-        Film film = getFilm(filmId);
+        Film film = films.get(filmId);
         if (film == null) {
             log.error("Фильм не найден: {}", filmId);
         }
@@ -80,6 +81,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         filmHelper.validateFilm(film);
         // Тут дали фильму уникальный id
         film.setId(getNextId());
+        film.setUserLikes(new HashSet<>());
         films.put(film.getId(), film);
         log.info("Создали фильм: {}", film);
         return film;
