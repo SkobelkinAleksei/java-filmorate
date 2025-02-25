@@ -1,19 +1,44 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.Collection;
+import java.util.*;
 
-public interface FilmService {
+@AllArgsConstructor
+@Service
+@Slf4j
+public class FilmService {
+    private FilmStorage filmStorage;
 
-    Collection<Film> getFilms();
+    public Collection<Film> findAll() {
+        return filmStorage.findAll();
+    }
 
-    // Добавляем фильм
-    Film createFilm(Film film) throws ValidationException;
+    public boolean addLike(Long filmId, Long userId) {
+        return filmStorage.addLike(filmId, userId);
+    }
 
-    Film update(Film newFilm);
+    public boolean removeLike(Long filmId, Long userId) {
+        return filmStorage.removeLike(filmId, userId);
+    }
 
-    // вспомогательный метод для генерации идентификатора нового поста
-    long getNextId();
+    public Collection<Film> getTopMovies() {
+        return filmStorage.getTopMovies();
+    }
+
+    public Film getFilm(Long filmId) {
+        return filmStorage.getFilm(filmId);
+    }
+
+    public Film createFilm(Film film) {
+        return filmStorage.createFilm(film);
+    }
+
+    public Film update(Film newFilm) {
+        return filmStorage.update(newFilm);
+    }
 }

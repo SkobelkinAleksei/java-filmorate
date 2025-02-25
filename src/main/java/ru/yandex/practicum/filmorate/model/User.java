@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Builder
 @Data
@@ -26,4 +27,6 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Др не может быть пустым или null")
     private LocalDate birthday;
+
+    private Set<Long> friendIds;
 }

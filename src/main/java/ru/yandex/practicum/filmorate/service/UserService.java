@@ -1,19 +1,51 @@
 package ru.yandex.practicum.filmorate.service;
 
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import java.util.Collection;
+import java.util.*;
 
-public interface UserService {
+@AllArgsConstructor
+@Service
+@Data
+@Slf4j
+public class UserService {
+    private InMemoryUserStorage userStorage;
 
-    Collection<User> findAll();
+    public Collection<User> findAll() {
+        return userStorage.findAll();
+    }
 
-    User create(User user);
+    public User getUser(long userId) {
+        return userStorage.getUser(userId);
+    }
 
-    // вспомогательный метод для генерации идентификатора нового поста
-    long getNextId();
+    public User create(@Valid User user) {
+        return userStorage.create(user);
+    }
 
-    void duplMailCheck(User user);
+    public User update(@Valid User newUser) {
+        return userStorage.update(newUser);
+    }
 
-    User update(User newUser);
+    public Set<User> getFriends(long userId) {
+        return userStorage.getFriends(userId);
+    }
+
+    public boolean addFriend(long userId, long friendId) {
+        return userStorage.addFriend(userId, friendId);
+    }
+
+    public boolean removeFriend(long userId, long friendId) {
+        return userStorage.removeFriend(userId, friendId);
+    }
+
+    public List<User> getMutualFriends(Long user1, Long user2) {
+        return userStorage.getMutualFriends(user1, user2);
+    }
 }
