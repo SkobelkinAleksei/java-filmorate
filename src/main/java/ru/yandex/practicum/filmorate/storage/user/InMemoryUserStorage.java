@@ -158,7 +158,7 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = getUser(friendId);
 
         if (!user.getFriendIds().contains(friendId) || !friend.getFriendIds().contains(userId)) {
-            logHelper.logAndThrow(new NullPointerException(ExceptionMessages.NO_FRIEND));
+            logHelper.logAndThrow(new NotFoundException(ExceptionMessages.NO_FRIEND));
             return false;
         }
 
@@ -172,7 +172,7 @@ public class InMemoryUserStorage implements UserStorage {
             log.info("Друзья были успешно удалены: UserId = {}, FriendId = {}", userId, friendId);
             return true;
         } else {
-            log.info("Ошибка при удалении друзей: UserId = {}, FriendId = {}", userId, friendId);
+            log.error("Ошибка при удалении друзей: UserId = {}, FriendId = {}", userId, friendId);
             return false;
         }
     }
