@@ -150,7 +150,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public boolean removeFriend(long userId, long friendId) {
         if (userId == 0 || friendId == 0) {
-            log.error( "UserId и FriendId не могут быть равны нулю");
+            log.error("UserId и FriendId не могут быть равны нулю");
             return false;
         }
 
