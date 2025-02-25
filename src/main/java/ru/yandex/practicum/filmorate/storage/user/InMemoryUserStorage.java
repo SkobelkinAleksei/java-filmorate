@@ -159,7 +159,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         log.info("Проверяем есть ли взаимность ");
         if (!user.getFriendIds().contains(friendId) || !friend.getFriendIds().contains(userId)) {
-            log.error( "Не являются общими друзьями");
+            log.error("Не являются общими друзьями");
             return false;
         }
 
