@@ -248,7 +248,7 @@ class UserControllerTest {
 //        // Это не общий друг
 //        userController.addFriend(user9.getId(), user12.getId());
 //
-//        List<User> mutualFriends = userController.getMutualFriends(user1, user9);
+//        Set<Long> mutualFriends = userController.getMutualFriends(user1.ge);
 //
 //        assertTrue(mutualFriends.contains(user10), "User10 должен быть общим другом");
 //        assertTrue(mutualFriends.contains(user11), "User11 должен быть общим другом");

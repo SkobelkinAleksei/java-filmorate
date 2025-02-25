@@ -9,9 +9,9 @@ public interface FilmStorage {
 
     Collection<Film> findAll();
 
-    void addLike(Long filmId, Long userId);
+    boolean addLike(Long filmId, Long userId);
 
-    void removeLike(Long filmId, Long userId);
+    boolean removeLike(Long filmId, Long userId);
 
     Collection<Film> getTopMovies();
 

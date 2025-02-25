@@ -49,15 +49,15 @@ public class UserController {
 
     // Добавление в друзья
     @PutMapping("/{userId}/friends/{friendId}")
-    public void addFriend(@PathVariable long userId, @PathVariable long friendId) throws NotFoundException {
-        userService.addFriend(userId, friendId);
+    public boolean addFriend(@PathVariable long userId, @PathVariable long friendId) throws NotFoundException {
+        return userService.addFriend(userId, friendId);
     }
 
     // Удаление из друзей
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public void removeFriend(@PathVariable long userId, @PathVariable long friendId) {
-        userService.removeFriend(userId, friendId);
+    public boolean removeFriend(@PathVariable long userId, @PathVariable long friendId) {
+        return userService.removeFriend(userId, friendId);
     }
 
     // Возвращаем друзей User

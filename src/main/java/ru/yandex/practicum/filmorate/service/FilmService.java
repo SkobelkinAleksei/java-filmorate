@@ -18,12 +18,12 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
-    public void addLike(Long filmId, Long userId) {
-        filmStorage.addLike(filmId, userId);
+    public boolean addLike(Long filmId, Long userId) {
+        return filmStorage.addLike(filmId, userId);
     }
 
-    public void removeLike(Long filmId, Long userId) {
-        filmStorage.removeLike(filmId, userId);
+    public boolean removeLike(Long filmId, Long userId) {
+        return filmStorage.removeLike(filmId, userId);
     }
 
     public Collection<Film> getTopMovies() {

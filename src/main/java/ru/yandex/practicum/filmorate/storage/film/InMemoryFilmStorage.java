@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.ExceptionMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
 import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
 
@@ -23,6 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static final Map<Long, Film> films = new HashMap<>();
     private final FilmValidHelper filmHelper;
     private final LogAndThrowHelper logHelper;
+    private final UserService userService;
 
     @Override
     public Collection<Film> findAll() {
@@ -31,45 +34,70 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(Long filmId, Long userId) {
-        log.info("Добавляем лайк фильму с ID: {}", filmId);
+    public boolean addLike(Long filmId, Long userId) {
+        log.info("Добавляем лайк фильму с ID: {}, от User: {}", filmId, userId);
         Film film = getFilm(filmId);
+        User user = userService.getUser(userId);
+
 
         if (film == null) {
             log.error("Фильм не найден: {}", filmId);
             logHelper.logAndThrow(new NullPointerException("Film == null"));
+            return false;
+
         } else if (film.getUserLikes() == null) {
             log.error("userLikes у фильма {} равен null", filmId);
             logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
+            return false;
         }
 
-        if (!film.getUserLikes().contains(userId)) {
-            logHelper.logAndThrow(new NullPointerException("userId некорректный: " + userId));
+        if (!userService.findAll().contains(user)) {
+            log.error("User с ID:{} не был найден", userId);
+            logHelper.logAndThrow(new NullPointerException("User == null"));
+            return false;
         }
 
-        film.getUserLikes().add(userId);
+        if (film.getUserLikes().contains(userId)) {
+            logHelper.logAndThrow(new NullPointerException("Фильм уже содержит лайк от User: " + userId));
+            return false;
+        }
+
+        boolean addLike = film.getUserLikes().add(userId);
         log.info("Добавили лайк фильму {}", film.getUserLikes());
+        return addLike;
     }
 
     @Override
-    public void removeLike(Long filmId, Long userId) {
+    public boolean removeLike(Long filmId, Long userId) {
         log.info("Удаляем лайк у фильма");
         Film film = getFilm(filmId);
+        User user = userService.getUser(userId);
 
         if (film == null) {
             log.error("При удалении лайка фильм не был найден: {}", filmId);
             logHelper.logAndThrow(new NullPointerException("Film == null"));
+            return false;
+
         } else if (film.getUserLikes() == null) {
             log.error("При удалении лайка  userLikes у фильма {} равен null", filmId);
             logHelper.logAndThrow(new NullPointerException("UserLikes == null"));
+            return false;
         }
 
-        if (!film.getUserLikes().contains(userId)) {
-            logHelper.logAndThrow(new NullPointerException("userId некорректный: " + userId));
+        if (!userService.findAll().contains(user)) {
+            log.error("User с ID:{} не найден", userId);
+            logHelper.logAndThrow(new NullPointerException("User == null"));
+            return false;
         }
 
-        film.getUserLikes().remove(userId);
+        if (!film.getUserLikes().contains(user.getId())) {
+            logHelper.logAndThrow(new NullPointerException("Film" + film + "не содержит лайк от User:" + userId));
+            return false;
+        }
+
+        boolean removeLike = film.getUserLikes().remove(userId);
         log.info("Пользователь с ID = {} забрал лайк с фильма с ID = {}", userId, filmId);
+        return removeLike;
     }
 
     @Override
@@ -113,7 +141,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Обновление данных о фильме: {}", newFilm);
         filmHelper.validateFilmId(newFilm.getId());
 
-        Film oldFilm = films.get(newFilm.getId());
+        Film oldFilm = getFilm(newFilm.getId());
         if (oldFilm == null) {
             throw new NotFoundException(String.format(ExceptionMessages.FILM_NOT_FOUND, newFilm.getId()));
         }

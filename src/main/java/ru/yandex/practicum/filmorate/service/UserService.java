@@ -37,12 +37,12 @@ public class UserService {
         return userStorage.getFriends(userId);
     }
 
-    public void addFriend(long userId, long friendId) {
-        userStorage.addFriend(userId, friendId);
+    public boolean addFriend(long userId, long friendId) {
+        return userStorage.addFriend(userId, friendId);
     }
 
-    public void removeFriend(long userId, long friendId) {
-        userStorage.removeFriend(userId, friendId);
+    public boolean removeFriend(long userId, long friendId) {
+        return userStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getMutualFriends(Long user1, Long user2) {

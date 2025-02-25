@@ -123,63 +123,75 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(long userId, long friendId) {
+    public boolean addFriend(long userId, long friendId) {
         if (userId == 0 || friendId == 0) {
             logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
+            return false;
         }
 
         if (!users.containsKey(userId)) {
             logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
+            return false;
         }
 
         if (!users.containsKey(friendId)) {
             logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
+            return false;
         }
 
         log.info("Добавляем User нового друга");
-        users.get(userId)
+        boolean addFromUser = users.get(userId)
                 .getFriendIds()
                 .add(friendId);
 
 
         log.info("Добавляем Новому другу в друзья User");
-        users.get(friendId)
+        boolean addFromFriend = users.get(friendId)
                 .getFriendIds()
                 .add(userId);
 
-        log.info("Друг был успешно добавлен");
+        log.info("Друзья были взаимно добавлены");
+        return addFromUser && addFromFriend;
     }
 
     @Override
-    public void removeFriend(long userId, long friendId) {
+    public boolean removeFriend(long userId, long friendId) {
         User user = getUser(userId);
         User friend = getUser(friendId);
 
         if (!user.getFriendIds().contains(friendId) && !friend.getFriendIds().contains(userId)) {
             logHelper.logAndThrow(new NullPointerException(ExceptionMessages.NO_FRIEND));
+            return false;
         }
         if (userId == 0 || friendId == 0) {
             logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
+            return false;
         }
 
         if (!users.containsKey(userId)) {
             logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
+            return false;
         }
 
         if (!users.containsKey(friendId)) {
             logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
+            return false;
         }
 
 
         log.info("Удаляем у User друга по ID");
-        users.get(userId)
-                .getFriendIds()
-                .remove(friendId);
+        boolean removedFromUser = users.get(userId)
+                                        .getFriendIds()
+                                        .remove(friendId);
 
         log.info("Удаляем у Друга user по ID");
-        users.get(friendId)
-                .getFriendIds()
-                .remove(userId);
+        boolean removedFromFriend = users.get(friendId)
+                                        .getFriendIds()
+                                        .remove(userId);
+
+
+        log.info("Друзья были взаимно удалены");
+        return removedFromUser && removedFromFriend;
     }
 
     @Override

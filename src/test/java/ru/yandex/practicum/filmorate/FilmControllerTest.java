@@ -8,9 +8,12 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
 import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
+import ru.yandex.practicum.filmorate.utils.UserValidHelper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,7 +34,7 @@ public class FilmControllerTest {
     @BeforeAll
     public static void start() throws ValidationException {
         // Создаем экземпляр сервиса
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(new FilmValidHelper(new LogAndThrowHelper()), new LogAndThrowHelper()));
+        FilmService filmService = new FilmService(new InMemoryFilmStorage(new FilmValidHelper(new LogAndThrowHelper()), new LogAndThrowHelper(), new UserService(new InMemoryUserStorage(new LogAndThrowHelper(), new UserValidHelper(new LogAndThrowHelper())))));
 
         // Создаем контроллер, передавая ему сервис и хранилище
         filmController = new FilmController(filmService);
@@ -91,7 +94,6 @@ public class FilmControllerTest {
                 .duration(100)
                 .userLikes(new HashSet<>())
                 .build();
-
     }
 
     @Test
