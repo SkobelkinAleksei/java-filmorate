@@ -110,88 +110,71 @@ public class InMemoryUserStorage implements UserStorage {
     public Set<User> getFriends(long userId) {
         log.info("Получаем всех друзей у User по его ID");
         // Получаем пользователя по userId
-        User user = users.get(userId);
+        User user = getUser(userId);
 
-        if (userId == 0 || !users.containsKey(userId)) {
-            logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
-        }
         // Получаем множество ID друзей и конвертируем их в пользователей
         return user.getFriendIds()
                 .stream()
                 .map(friendId -> users.get(friendId))
+                .filter(Objects::nonNull)  // Фильтруем null значения
                 .collect(Collectors.toSet());
     }
 
     @Override
     public boolean addFriend(long userId, long friendId) {
         if (userId == 0 || friendId == 0) {
-            logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
+            logHelper.logAndThrow(new NullPointerException("UserId и FriendId не могут быть равны нулю"));
             return false;
         }
 
-        if (!users.containsKey(userId)) {
-            logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
-            return false;
-        }
+        User user = getUser(userId);
+        User friend = getUser(friendId);
 
-        if (!users.containsKey(friendId)) {
-            logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
-            return false;
-        }
 
         log.info("Добавляем User нового друга");
-        boolean addFromUser = users.get(userId)
-                .getFriendIds()
-                .add(friendId);
+        boolean addFromUser = user.getFriendIds().add(friendId);
 
 
         log.info("Добавляем Новому другу в друзья User");
-        boolean addFromFriend = users.get(friendId)
-                .getFriendIds()
-                .add(userId);
+        boolean addFromFriend = friend.getFriendIds().add(userId);
 
-        log.info("Друзья были взаимно добавлены");
-        return addFromUser && addFromFriend;
+        if (addFromUser && addFromFriend) {
+            log.info("Друзья были успешно добавлены: UserId = {}, FriendId = {}", userId, friendId);
+            return true;
+        } else {
+            log.info("Ошибка при добавлении друзей: UserId = {}, FriendId = {}", userId, friendId);
+            return false;
+        }
     }
 
     @Override
     public boolean removeFriend(long userId, long friendId) {
-        User user = getUser(userId);
-        User friend = getUser(friendId);
-
-        if (!user.getFriendIds().contains(friendId) && !friend.getFriendIds().contains(userId)) {
-            logHelper.logAndThrow(new NullPointerException(ExceptionMessages.NO_FRIEND));
-            return false;
-        }
         if (userId == 0 || friendId == 0) {
             logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
             return false;
         }
 
-        if (!users.containsKey(userId)) {
-            logHelper.logAndThrow(new NullPointerException("UserId не могут быть null"));
+        User user = getUser(userId);
+        User friend = getUser(friendId);
+
+        if (!user.getFriendIds().contains(friendId) || !friend.getFriendIds().contains(userId)) {
+            logHelper.logAndThrow(new NullPointerException(ExceptionMessages.NO_FRIEND));
             return false;
         }
-
-        if (!users.containsKey(friendId)) {
-            logHelper.logAndThrow(new NullPointerException("friendId не могут быть null"));
-            return false;
-        }
-
 
         log.info("Удаляем у User друга по ID");
-        boolean removedFromUser = users.get(userId)
-                                        .getFriendIds()
-                                        .remove(friendId);
+        boolean removedFromUser = user.getFriendIds().remove(friendId);
 
         log.info("Удаляем у Друга user по ID");
-        boolean removedFromFriend = users.get(friendId)
-                                        .getFriendIds()
-                                        .remove(userId);
+        boolean removedFromFriend = friend.getFriendIds().remove(userId);
 
-
-        log.info("Друзья были взаимно удалены");
-        return removedFromUser && removedFromFriend;
+        if (removedFromUser && removedFromFriend) {
+            log.info("Друзья были успешно удалены: UserId = {}, FriendId = {}", userId, friendId);
+            return true;
+        } else {
+            log.info("Ошибка при удалении друзей: UserId = {}, FriendId = {}", userId, friendId);
+            return false;
+        }
     }
 
     @Override
