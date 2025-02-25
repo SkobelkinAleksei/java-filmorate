@@ -157,8 +157,10 @@ public class InMemoryUserStorage implements UserStorage {
         User user = getUser(userId);
         User friend = getUser(friendId);
 
+        log.info("Проверяем есть ли взаимность ");
         if (!user.getFriendIds().contains(friendId) || !friend.getFriendIds().contains(userId)) {
-            throw new NotFoundException("Не являются общими друзьями");
+            logHelper.logAndThrow(new NullPointerException("Не являются общими друзьями"));
+            return false;
         }
 
         log.info("Удаляем у User друга по ID");

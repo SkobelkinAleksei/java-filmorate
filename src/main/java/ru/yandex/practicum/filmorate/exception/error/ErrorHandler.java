@@ -15,21 +15,21 @@ public class ErrorHandler {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse validationError(final ValidationException e) {
-        log.info("ERROR[400]: Произошла ошибка ValidationException: {}", e.getMessage());
+        log.error("ERROR[400]: Произошла ошибка ValidationException: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFoundError(final NotFoundException e) {
-        log.info("ERROR[404]: Произошла ошибка NotFoundException: {}", e.getMessage());
+        log.error("ERROR[404]: Произошла ошибка NotFoundException: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse exceptionError(final Exception e) {
-        log.info("ERROR[500]: Произошла ошибка ErrorException: {}", e.getMessage());
+        log.error("ERROR[500]: Произошла ошибка ErrorException: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }
