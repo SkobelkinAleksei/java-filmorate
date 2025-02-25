@@ -150,7 +150,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public boolean removeFriend(long userId, long friendId) {
         if (userId == 0 || friendId == 0) {
-            logHelper.logAndThrow(new IllegalArgumentException("UserId и FriendId не могут быть равны нулю"));
+            log.error( "UserId и FriendId не могут быть равны нулю");
             return false;
         }
 
@@ -159,7 +159,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         log.info("Проверяем есть ли взаимность ");
         if (!user.getFriendIds().contains(friendId) || !friend.getFriendIds().contains(userId)) {
-            logHelper.logAndThrow(new NullPointerException("Не являются общими друзьями"));
+            log.error( "Не являются общими друзьями");
             return false;
         }
 
