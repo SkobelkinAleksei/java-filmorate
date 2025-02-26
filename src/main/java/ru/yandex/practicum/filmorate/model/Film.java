@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+
 import java.time.LocalDate;
+import java.util.Set;
 
 @Builder
 @Data
@@ -24,4 +26,5 @@ public class Film {
     @NotNull(message = "Продолжительность фильма не может быть пуста или null")
     private int duration;
 
+    private Set<Long> userLikes;
 }
