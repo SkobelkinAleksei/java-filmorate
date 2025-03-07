@@ -128,7 +128,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film createFilm(@Valid Film film) throws ValidationException {
         log.info("Создание фильма: {}", film);
         filmHelper.validateFilm(film);
-        // Тут дали фильму уникальный id
         film.setId(getNextId());
         film.setUserLikes(new HashSet<>());
         films.put(film.getId(), film);

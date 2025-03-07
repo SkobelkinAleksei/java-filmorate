@@ -16,6 +16,7 @@ public class ExceptionMessages {
     public static final String FILM_RELEASE_DATE_IS_INCORRECT = "Дата релиза фильма не может быть раньше 28.12.1895г.";
     public static final String FILM_ID_CANNOT_BE_NULL = "ID фильма не может быть null";
     public static final String FILM_NOT_FOUND = "Фильм с id не удалось найти";
+    public static final String FILM_NOT_A_GENRE = "Фильм должен иметь хотя бы один жанр";
 
     //текс для DuplicatedDataException
     public static final String EMAIL_ALREADY_EXISTS = "Этот емейл уже используется";
