@@ -6,9 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.storage.user.StatusFriend;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.Map;
 
 @Builder
 @Data
@@ -28,5 +29,5 @@ public class User {
     @NotNull(message = "Др не может быть пустым или null")
     private LocalDate birthday;
 
-    private Set<Long> friendIds;
+    private Map<Long, StatusFriend> friendIds;
 }

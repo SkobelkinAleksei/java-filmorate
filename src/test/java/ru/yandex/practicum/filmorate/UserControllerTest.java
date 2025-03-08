@@ -14,7 +14,8 @@ import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
 import ru.yandex.practicum.filmorate.utils.UserValidHelper;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +49,7 @@ class UserControllerTest {
                 .email("name1@mail.ru")
                 .login("name1")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
         userController.create(user1);
 
@@ -58,7 +59,7 @@ class UserControllerTest {
                 .email("name2@mail.ru")
                 .login("name2")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
 
         // Неправильная почта
@@ -68,7 +69,7 @@ class UserControllerTest {
                 .email("name3mail.ru")
                 .login("name3")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
 
         // Задублировал почту
@@ -78,7 +79,7 @@ class UserControllerTest {
                 .email("name1@mail.ru")
                 .login("name4")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
 
         // Неправильный логин
@@ -88,7 +89,7 @@ class UserControllerTest {
                 .email("name5@mail.ru")
                 .login(" ")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
 
         // Неправильная дата ДР
@@ -98,7 +99,7 @@ class UserControllerTest {
                 .email("name6@mail.ru")
                 .login("name6")
                 .birthday(LocalDate.of(2028, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
 
         // Такого ID нету
@@ -108,7 +109,7 @@ class UserControllerTest {
                 .email("name8@mail.ru")
                 .login("name8")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
 
         // storage
@@ -118,7 +119,7 @@ class UserControllerTest {
                 .email("name9@mail.ru")
                 .login("name9")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
         userController.create(user9);
 
@@ -128,7 +129,7 @@ class UserControllerTest {
                 .email("name10@mail.ru")
                 .login("name10")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
         userController.create(user10);
 
@@ -138,7 +139,7 @@ class UserControllerTest {
                 .email("name11@mail.ru")
                 .login("name11")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
         userController.create(user11);
 
@@ -148,7 +149,7 @@ class UserControllerTest {
                 .email("name12@mail.ru")
                 .login("name12")
                 .birthday(LocalDate.of(2020, 05, 19))
-                .friendIds(new HashSet<>())
+                .friendIds(new HashMap<>())
                 .build();
         userController.create(user12);
     }
@@ -204,56 +205,64 @@ class UserControllerTest {
         userController.addFriend(user1.getId(), user9.getId());
 
         // Проверка, что теперь user9 в друзьях у user1
-        assertTrue(user1.getFriendIds().contains(user9.getId()), "User1 должен иметь в друзьях User9");
+        assertTrue(user1.getFriendIds().containsKey(user9.getId()), "User1 должен иметь в друзьях User9");
 
         // Проверка, что user1 в друзьях у user9
-        assertTrue(user9.getFriendIds().contains(user1.getId()), "User9 должен иметь в друзьях User1");
+        assertTrue(user9.getFriendIds().containsKey(user1.getId()), "User9 должен иметь в друзьях User1");
     }
 
     @Test
     public void removeFriendTest() {
         // Добавили в друзья
         userController.addFriend(user1.getId(), user9.getId());
+        userController.addFriend(user9.getId(), user1.getId());
 
         // Удалили из друзей
         userController.removeFriend(user1.getId(), user9.getId());
 
-        // Проверка, что теперь user9 в друзьях у user1
-        assertFalse(user1.getFriendIds().contains(user9.getId()), "User1 не должен иметь в друзьях User9");
+        // Проверка, что теперь не user9 в друзьях у user1
+        assertFalse(user1.getFriendIds().containsKey(user9.getId()), "User1 не должен иметь в друзьях User9");
 
-        // Проверка, что user1 в друзьях у user9
-        assertFalse(user9.getFriendIds().contains(user1.getId()), "User9 не должен иметь в друзьях User1");
+        // Проверка, что user1 не в друзьях у user9
+        assertFalse(user9.getFriendIds().containsKey(user1.getId()), "User9 не должен иметь в друзьях User1");
     }
 
     @Test
     public void getFriendsTest() {
         // Добавили в друзья
         userController.addFriend(user1.getId(), user9.getId());
+        userController.addFriend(user9.getId(), user1.getId());
+
         // Проверка, что метод getFriends работает правильно.
         Set<User> friendsOfUser = userController.getFriends(user1.getId());
         // Проверка, что user1 действительно имеет user9 в списке друзей
         assertTrue(friendsOfUser.contains(user9), "user1 действительно имеет user9 в списке друзей");
     }
 
-//    @Test
-//    public void getMutualFriendsTest() {
-//        // Это общие друзья
-//        userController.addFriend(user1.getId(), user10.getId());
-//        userController.addFriend(user1.getId(), user11.getId());
-//
-//        // Это общие друзья
-//        userController.addFriend(user9.getId(), user10.getId());
-//        userController.addFriend(user9.getId(), user11.getId());
-//
-//        // Это не общий друг
-//        userController.addFriend(user9.getId(), user12.getId());
-//
-//        Set<Long> mutualFriends = userController.getMutualFriends(user1.ge);
-//
-//        assertTrue(mutualFriends.contains(user10), "User10 должен быть общим другом");
-//        assertTrue(mutualFriends.contains(user11), "User11 должен быть общим другом");
-//        assertFalse(mutualFriends.contains(user12), "User12 не должен быть общим другом");
-//    }
+    @Test
+    public void getMutualFriendsTest() {
+        // Это общие друзья
+        userController.addFriend(user1.getId(), user10.getId());
+        userController.addFriend(user1.getId(), user11.getId());
+        userController.addFriend(user10.getId(), user1.getId());
+        userController.addFriend(user11.getId(), user1.getId());
+
+        // Это общие друзья
+        userController.addFriend(user9.getId(), user10.getId());
+        userController.addFriend(user9.getId(), user11.getId());
+        userController.addFriend(user10.getId(), user9.getId());
+        userController.addFriend(user11.getId(), user9.getId());
+
+        // Это не общий друг
+        userController.addFriend(user9.getId(), user12.getId());
+        userController.addFriend(user12.getId(), user9.getId());
+
+        List<User> mutualFriends = userController.getMutualFriends(user1.getId(), user9.getId());
+
+        assertTrue(mutualFriends.contains(user10), "User10 должен быть общим другом");
+        assertTrue(mutualFriends.contains(user11), "User11 должен быть общим другом");
+        assertFalse(mutualFriends.contains(user12), "User12 не должен быть общим другом");
+    }
 
     @AfterAll
     public static void allUsersTest() {

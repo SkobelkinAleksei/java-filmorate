@@ -17,11 +17,8 @@ public class ExceptionMessages {
     public static final String FILM_ID_CANNOT_BE_NULL = "ID фильма не может быть null";
     public static final String FILM_NOT_FOUND = "Фильм с id не удалось найти";
     public static final String FILM_NOT_A_GENRE = "Фильм должен иметь хотя бы один жанр";
+    public static final String FILM_NOT_A_RATING = "Фильм должен иметь рейтинг";
 
     //текс для DuplicatedDataException
     public static final String EMAIL_ALREADY_EXISTS = "Этот емейл уже используется";
-
-    //
-    public static final String NO_FRIEND = "Не являются друзьями";
-
 }

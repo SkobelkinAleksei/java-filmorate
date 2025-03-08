@@ -37,5 +37,8 @@ public class FilmValidHelper implements FilmValidMethods {
         if (film.getGenre().isEmpty()) {
             logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_NOT_A_GENRE));
         }
+        if (film.getRating() == null) {
+            logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_NOT_A_RATING));
+        }
     }
 }

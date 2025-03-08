@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
+import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -30,5 +30,7 @@ public class Film {
 
     private Set<Long> userLikes;
 
-    private HashSet<GenreFilm> genre;
+    private Set<GenreFilm> genre;
+
+    private RatingFilm rating;
 }

@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.utils.FilmValidHelper;
 import ru.yandex.practicum.filmorate.utils.LogAndThrowHelper;
@@ -18,6 +20,7 @@ import ru.yandex.practicum.filmorate.utils.UserValidHelper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +38,6 @@ public class FilmControllerTest {
     public static void start() throws ValidationException {
         // Создаем экземпляр сервиса
         FilmService filmService = new FilmService(new InMemoryFilmStorage(new FilmValidHelper(new LogAndThrowHelper()), new LogAndThrowHelper(), new UserService(new InMemoryUserStorage(new LogAndThrowHelper(), new UserValidHelper(new LogAndThrowHelper())))));
-
         // Создаем контроллер, передавая ему сервис и хранилище
         filmController = new FilmController(filmService);
 
@@ -46,6 +48,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.parse("2012-02-12", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .duration(120)
                 .userLikes(new HashSet<>())
+                .genre(new HashSet<>(Set.of(GenreFilm.Comedy, GenreFilm.Drama)))
+                .rating(RatingFilm.PG)
                 .build();
 
         filmController.create(validFilm);

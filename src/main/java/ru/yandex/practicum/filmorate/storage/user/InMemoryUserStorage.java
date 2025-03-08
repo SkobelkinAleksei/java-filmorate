@@ -58,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         // Тут дали Пользователю уникальный id
         user.setId(getNextId());
-        user.setFriendIds(new HashSet<>());
+        user.setFriendIds(new HashMap<>());
         users.put(user.getId(), user);
         log.info("Создали успешно пользователя {}", user);
         return user;
@@ -99,6 +99,7 @@ public class InMemoryUserStorage implements UserStorage {
             oldUser.setLogin(newUser.getLogin());
             oldUser.setName(newUser.getName() != null ? newUser.getName() : newUser.getLogin());
             oldUser.setBirthday(newUser.getBirthday());
+            oldUser.setFriendIds(newUser.getFriendIds());
             return oldUser;
         } else {
             logHelper.logAndThrow(new NotFoundException("Пользователь с id = " + newUser.getId() + " не может быть найден"));
@@ -114,8 +115,10 @@ public class InMemoryUserStorage implements UserStorage {
 
         // Получаем множество ID друзей и конвертируем их в пользователей
         return user.getFriendIds()
+                .entrySet()  // Получаем все записи (ключ, значение) из Map
                 .stream()
-                .map(friendId -> users.get(friendId))
+                .filter(entry -> entry.getValue() == StatusFriend.Friends)  // Отбираем только тех, у кого статус "Friends"
+                .map(entry -> users.get(entry.getKey()))  // Получаем User по ключу (ID друга)
                 .filter(Objects::nonNull)  // Фильтруем null значения
                 .collect(Collectors.toSet());
     }
@@ -130,19 +133,26 @@ public class InMemoryUserStorage implements UserStorage {
         User user = getUser(userId);
         User friend = getUser(friendId);
 
+        log.info("Проверяем, если заявка висит в друзьях");
+        if (user.getFriendIds().get(friend.getId()) == StatusFriend.Waiting_for_answer) {
+            log.info("Заявка в друзья висит");
 
-        log.info("Добавляем User нового друга");
-        boolean addFromUser = user.getFriendIds().add(friendId);
+            user.getFriendIds().put(friend.getId(), StatusFriend.Friends);
+            friend.getFriendIds().put(user.getId(), StatusFriend.Friends);
+            log.info("Приняли зявку и сделали взаимными друзьями");
+            return true;
 
+        } else if (!user.getFriendIds().containsKey(friend.getId()) && !friend.getFriendIds().containsKey(user.getId())) {
+            log.info("Отправляем заявку, друзья не были добавлены");
 
-        log.info("Добавляем Новому другу в друзья User");
-        boolean addFromFriend = friend.getFriendIds().add(userId);
+            user.getFriendIds().put(friend.getId(), StatusFriend.Friend_request);
+            log.info("Добавили friend к User, но со статусом отправленной заявки");
 
-        if (addFromUser && addFromFriend) {
-            log.info("Друзья были успешно добавлены: UserId = {}, FriendId = {}", userId, friendId);
+            friend.getFriendIds().put(user.getId(), StatusFriend.Waiting_for_answer);
+            log.info("Добавили User к friend, но со статусом ожидания принятия");
             return true;
         } else {
-            log.info("Ошибка при добавлении друзей: UserId = {}, FriendId = {}", userId, friendId);
+            log.error("Заявка либо была отправлена, либо уже являются друзьями");
             return false;
         }
     }
@@ -158,16 +168,20 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = getUser(friendId);
 
         log.info("Проверяем есть ли взаимность ");
-        if (!user.getFriendIds().contains(friendId) || !friend.getFriendIds().contains(userId)) {
+        if (!(user.getFriendIds().get(friend.getId()) == StatusFriend.Friends) &&
+                !(friend.getFriendIds().get(user.getId()) == StatusFriend.Friends)) {
+
             log.error("Не являются общими друзьями");
             return false;
         }
 
         log.info("Удаляем у User друга по ID");
-        boolean removedFromUser = user.getFriendIds().remove(friendId);
+        user.getFriendIds().remove(friend.getId());
+        boolean removedFromUser = user.getFriendIds().containsKey(friend.getId());
 
         log.info("Удаляем у Друга user по ID");
-        boolean removedFromFriend = friend.getFriendIds().remove(userId);
+        friend.getFriendIds().remove(userId);
+        boolean removedFromFriend = friend.getFriendIds().containsKey(user.getId());
 
         if (removedFromUser && removedFromFriend) {
             log.info("Друзья были успешно удалены: UserId = {}, FriendId = {}", userId, friendId);
@@ -190,18 +204,30 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         log.info("Закидываем все id в Set, а дальше преобразуем в список");
-        Set<Long> commonFriendsIds = new HashSet<>(userOne.getFriendIds());
-        commonFriendsIds.retainAll(userTwo.getFriendIds());
+        Set<Long> userOneFriendIds = userOne.getFriendIds().entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() == StatusFriend.Friends) // Статус "Friends"
+                .map(Map.Entry::getKey) // Получаем только ID друзей
+                .collect(Collectors.toSet());
 
-        log.info("Преобразуем в список");
-        List<User> commonFriends = new ArrayList<>();
-        for (Long friendId : commonFriendsIds) {
-            User friend = users.get(friendId); // Получаем пользователя по ID
-            if (friend != null) { // Проверяем, существует ли такой пользователь
-                commonFriends.add(friend);
-            }
-        }
+        // Теперь получаем все ID друзей для userTwo
+        Set<Long> userTwoFriendIds = userTwo.getFriendIds().entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() == StatusFriend.Friends) // Статус "Friends"
+                .map(Map.Entry::getKey) // Получаем только ID друзей
+                .collect(Collectors.toSet());
+
+        // Пересечение ID друзей
+        userOneFriendIds.retainAll(userTwoFriendIds);
+
+        log.info("Преобразуем пересеченные ID в список пользователей");
+        // Теперь конвертируем пересеченные ID обратно в объекты User
+        List<User> commonFriends = userOneFriendIds.stream()
+                .map(users::get) // Получаем пользователя по ID
+                .filter(Objects::nonNull) // Отфильтровываем null значения
+                .collect(Collectors.toList()); // Собираем в список
 
         return commonFriends;
+
     }
 }
