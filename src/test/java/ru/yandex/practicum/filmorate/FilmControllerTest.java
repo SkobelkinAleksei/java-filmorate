@@ -48,7 +48,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.parse("2012-02-12", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .duration(120)
                 .userLikes(new HashSet<>())
-                .genre(new HashSet<>(Set.of(GenreFilm.Comedy, GenreFilm.Drama)))
+                .genre(new HashSet<>(Set.of(GenreFilm.COMEDY, GenreFilm.DRAMA)))
                 .rating(RatingFilm.PG)
                 .build();
 

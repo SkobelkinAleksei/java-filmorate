@@ -117,7 +117,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user.getFriendIds()
                 .entrySet()  // Получаем все записи (ключ, значение) из Map
                 .stream()
-                .filter(entry -> entry.getValue() == StatusFriend.Friends)  // Отбираем только тех, у кого статус "Friends"
+                .filter(entry -> entry.getValue() == StatusFriend.FRIEND)  // Отбираем только тех, у кого статус "Friends"
                 .map(entry -> users.get(entry.getKey()))  // Получаем User по ключу (ID друга)
                 .filter(Objects::nonNull)  // Фильтруем null значения
                 .collect(Collectors.toSet());
@@ -134,21 +134,21 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = getUser(friendId);
 
         log.info("Проверяем, если заявка висит в друзьях");
-        if (user.getFriendIds().get(friend.getId()) == StatusFriend.Waiting_for_answer) {
+        if (user.getFriendIds().get(friend.getId()) == StatusFriend.WAITING_FOR_ANSWER) {
             log.info("Заявка в друзья висит");
 
-            user.getFriendIds().put(friend.getId(), StatusFriend.Friends);
-            friend.getFriendIds().put(user.getId(), StatusFriend.Friends);
+            user.getFriendIds().put(friend.getId(), StatusFriend.FRIEND);
+            friend.getFriendIds().put(user.getId(), StatusFriend.FRIEND);
             log.info("Приняли зявку и сделали взаимными друзьями");
             return true;
 
-        } else if (!user.getFriendIds().containsKey(friend.getId()) && !friend.getFriendIds().containsKey(user.getId())) {
+        } else if (!user.getFriendIds().containsKey(friend.getId())) {
             log.info("Отправляем заявку, друзья не были добавлены");
 
-            user.getFriendIds().put(friend.getId(), StatusFriend.Friend_request);
+            user.getFriendIds().put(friend.getId(), StatusFriend.FRIEND_REQUEST);
             log.info("Добавили friend к User, но со статусом отправленной заявки");
 
-            friend.getFriendIds().put(user.getId(), StatusFriend.Waiting_for_answer);
+            friend.getFriendIds().put(user.getId(), StatusFriend.WAITING_FOR_ANSWER);
             log.info("Добавили User к friend, но со статусом ожидания принятия");
             return true;
         } else {
@@ -168,8 +168,7 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = getUser(friendId);
 
         log.info("Проверяем есть ли взаимность ");
-        if (!(user.getFriendIds().get(friend.getId()) == StatusFriend.Friends) &&
-                !(friend.getFriendIds().get(user.getId()) == StatusFriend.Friends)) {
+        if (!(user.getFriendIds().get(friend.getId()) == StatusFriend.FRIEND)) {
 
             log.error("Не являются общими друзьями");
             return false;
@@ -206,14 +205,14 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Закидываем все id в Set, а дальше преобразуем в список");
         Set<Long> userOneFriendIds = userOne.getFriendIds().entrySet()
                 .stream()
-                .filter(entry -> entry.getValue() == StatusFriend.Friends) // Статус "Friends"
+                .filter(entry -> entry.getValue() == StatusFriend.FRIEND) // Статус "Friends"
                 .map(Map.Entry::getKey) // Получаем только ID друзей
                 .collect(Collectors.toSet());
 
         // Теперь получаем все ID друзей для userTwo
         Set<Long> userTwoFriendIds = userTwo.getFriendIds().entrySet()
                 .stream()
-                .filter(entry -> entry.getValue() == StatusFriend.Friends) // Статус "Friends"
+                .filter(entry -> entry.getValue() == StatusFriend.FRIEND) // Статус "Friends"
                 .map(Map.Entry::getKey) // Получаем только ID друзей
                 .collect(Collectors.toSet());
 
