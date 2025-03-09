@@ -1,6 +1,5 @@
 # java-filmorate
 Template repository for Filmorate project.
-
 https://dbdiagram.io/d/67cd689f263d6cf9a0ba5837
 
 ## Добавить нового пользователя 
