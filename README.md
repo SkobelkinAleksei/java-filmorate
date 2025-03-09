@@ -47,13 +47,15 @@ WHERE user_id = 1
 AND friend_id = 2;
 
 ## Добавить новый фильм 
-INSERT INTO movies(
+INSERT INTO movies
+(
     name,
     description,
     release_date,
     duration
 )
-VALUES (
+VALUES
+(
     'Film',
     'descr',
     '2000-10-10',
