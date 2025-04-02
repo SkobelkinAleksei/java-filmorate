@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import jakarta.validation.ValidationException;
+import ru.yandex.practicum.filmorate.model.modelFilm.Film;
+import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface FilmStorage {
 
@@ -15,11 +17,9 @@ public interface FilmStorage {
 
     Collection<Film> getTopMovies();
 
-    Film getFilm(Long filmId);
+    Optional<Film> getFilm(Long filmId);
 
-    Film createFilm(Film film) throws ValidationException;
+    int createFilm(FilmCreate film) throws ValidationException;
 
-    Film update(Film newFilm);
-
-    long getNextId();
+    Optional<Film> update(Film newFilm);
 }

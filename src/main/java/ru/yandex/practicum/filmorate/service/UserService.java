@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.model.modelUser.User;
+import ru.yandex.practicum.filmorate.model.modelUser.UserCreate;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.util.*;
 
@@ -15,37 +15,53 @@ import java.util.*;
 @Data
 @Slf4j
 public class UserService {
-    private InMemoryUserStorage userStorage;
+    private final UserDbStorage userDbStorage;
 
-    public Collection<User> findAll() {
-        return userStorage.findAll();
+    public List<User> findAll() {
+        List<User> allUser = userDbStorage.findAll();
+        if (allUser.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return allUser;
     }
 
     public User getUser(long userId) {
-        return userStorage.getUser(userId);
+        return userDbStorage.getUser(userId).orElseThrow(
+                () -> new IllegalStateException("User with id %s not found".formatted(userId))
+        );
     }
 
-    public User create(@Valid User user) {
-        return userStorage.create(user);
+    public int create(UserCreate user) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Емаил не может быть пустым");
+        }
+        return userDbStorage.create(user);
     }
 
-    public User update(@Valid User newUser) {
-        return userStorage.update(newUser);
+    public User update(User newUser) {
+        return userDbStorage.update(newUser);
     }
 
-    public Set<User> getFriends(long userId) {
-        return userStorage.getFriends(userId);
+    public List<User> getFriends(long userId) {
+        return userDbStorage.getFriends(userId);
     }
 
-    public boolean addFriend(long userId, long friendId) {
-        return userStorage.addFriend(userId, friendId);
+    public boolean addFriend(Long userId, Long friendId) {
+        userDbStorage.isCorrectUser(friendId);
+        if (userDbStorage.isUserExistFriend(userId, friendId)) {
+            throw new IllegalArgumentException("User with id = %s already exist friend with id = %s".formatted(userId, friendId));
+        }
+        return userDbStorage.addFriend(userId, friendId);
     }
 
     public boolean removeFriend(long userId, long friendId) {
-        return userStorage.removeFriend(userId, friendId);
+        if (!userDbStorage.isUserExistFriend(userId, friendId)) {
+            throw new IllegalArgumentException("User with id = %s has not friend with id = %s".formatted(userId, friendId));
+        }
+        return userDbStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getMutualFriends(Long user1, Long user2) {
-        return userStorage.getMutualFriends(user1, user2);
+       return userDbStorage.getMutualFriends(user1, user2);
     }
 }

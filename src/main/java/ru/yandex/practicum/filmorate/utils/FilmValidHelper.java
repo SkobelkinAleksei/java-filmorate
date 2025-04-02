@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.utils;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ExceptionMessages;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.modelFilm.Film;
 
 import java.time.LocalDate;
 
@@ -34,7 +34,7 @@ public class FilmValidHelper implements FilmValidMethods {
         if (film.getDuration() <= 0) {
             logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_LENGTH_IS_NEGATIVE));
         }
-        if (film.getGenre().isEmpty()) {
+        if (film.getGenre() == null) {
             logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_NOT_A_GENRE));
         }
         if (film.getRating() == null) {

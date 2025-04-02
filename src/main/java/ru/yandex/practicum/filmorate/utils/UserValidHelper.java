@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.utils;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ExceptionMessages;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
 

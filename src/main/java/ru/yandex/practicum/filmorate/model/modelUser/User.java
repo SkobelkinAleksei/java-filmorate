@@ -1,17 +1,23 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.model.modelUser;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.yandex.practicum.filmorate.storage.user.StatusFriend;
 
 import java.time.LocalDate;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
+@Getter
+@Setter
 @Data
 public class User {
     private Long id;
@@ -30,4 +36,29 @@ public class User {
     private LocalDate birthday;
 
     private Map<Long, StatusFriend> friendIds;
+
+    public User(Long id, String name, String email, String login, LocalDate birthday) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.login = login;
+        this.birthday = birthday;
+    }
+
+    public User(String name, LocalDate birthday) {
+        this.name = name;
+        this.birthday = birthday;
+    }
+
+    public User() {
+    }
+
+    public User(Long id, String name, String email, String login, LocalDate birthday, Map<Long, StatusFriend> friendIds) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.login = login;
+        this.birthday = birthday;
+        this.friendIds = friendIds;
+    }
 }

@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.modelUser.User;
+import ru.yandex.practicum.filmorate.model.modelUser.UserCreate;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -35,7 +35,7 @@ public class UserController {
     // Добавляем Пользователя
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@RequestBody User user) {
+    public int create(@RequestBody @Valid UserCreate user) {
         return userService.create(user);
     }
 
@@ -46,6 +46,7 @@ public class UserController {
     }
 
     // Добавление в друзья
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{userId}/friends/{friendId}")
     public boolean addFriend(@PathVariable long userId, @PathVariable long friendId) throws NotFoundException {
         return userService.addFriend(userId, friendId);
@@ -60,7 +61,7 @@ public class UserController {
 
     // Возвращаем друзей User
     @GetMapping("/{userId}/friends")
-    public Set<User> getFriends(@PathVariable long userId) throws NotFoundException {
+    public List<User> getFriends(@PathVariable long userId) throws NotFoundException {
         return userService.getFriends(userId);
     }
 

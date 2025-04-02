@@ -1,9 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-public enum RatingFilm {
-    G,
-    PG,
-    PG13,
-    R,
-    NC17
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RatingFilm {
+    private int id;
+    private String name;
 }

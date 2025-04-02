@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.modelFilm.Film;
+import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -33,7 +34,7 @@ public class FilmController {
     // Добавляем фильм
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@RequestBody Film film) {
+    public int createFilm(@RequestBody @Valid FilmCreate film) {
         return filmService.createFilm(film);
     }
 
