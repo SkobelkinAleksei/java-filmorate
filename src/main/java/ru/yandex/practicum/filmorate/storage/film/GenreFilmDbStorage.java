@@ -48,4 +48,14 @@ public class GenreFilmDbStorage implements GenreFilmStorage {
             return genreFilm;
         });
     }
+
+    private GenreFilm getGenreFilm(Long genreId) {
+        String sql = "SELECT id, genre_name FROM movie_genre WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNumber) ->
+                new GenreFilm(
+                        rs.getInt("id"),
+                        rs.getString("genre_name")
+                ), genreId
+        );
+    }
 }

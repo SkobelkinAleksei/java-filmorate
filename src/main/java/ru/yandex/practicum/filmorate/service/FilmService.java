@@ -1,12 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.modelFilm.Film;
 import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
+import ru.yandex.practicum.filmorate.model.modelUser.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -14,26 +19,46 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmDbStorage filmDbStorage;
+    private final UserDbStorage userDbStorage;
 
     public List<Film> findAll() {
         List<Film> films = filmDbStorage.findAll();
         log.info("Найдено {} фильмов", films.size());
+        if (films.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return films;
     }
 
     public boolean addLike(Long filmId, Long userId) {
         log.info("Добавление лайка: фильм с id {} от пользователя с id {}", filmId, userId);
-        return filmDbStorage.addLike(filmId, userId);
+        User user = userDbStorage.getUser(userId).orElseThrow(
+                () -> new EntityNotFoundException("User with id %s not found!".formatted(userId))
+        );
+
+        return filmDbStorage.addLike(filmId, user.getId());
     }
 
     public boolean removeLike(Long filmId, Long userId) {
         log.info("Удаление лайка: фильм с id {} от пользователя с id {}", filmId, userId);
-        return filmDbStorage.removeLike(filmId, userId);
+        User user = userDbStorage.getUser(userId).orElseThrow(
+                () -> new EntityNotFoundException("User with id %s not found!".formatted(userId))
+        );
+        Film film = filmDbStorage.getFilm(filmId).orElseThrow(
+                () -> new EntityNotFoundException("Film with id %s not found!".formatted(filmId))
+        );
+
+        return filmDbStorage.removeLike(film.getId(), user.getId());
     }
 
     public List<Film> getTopMovies() {
         List<Film> topMovies = filmDbStorage.getTopMovies();
         log.info("Получены топ {} фильмов", topMovies.size());
+        if (topMovies.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return topMovies;
     }
 

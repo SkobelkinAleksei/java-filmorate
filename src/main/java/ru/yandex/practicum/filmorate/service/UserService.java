@@ -62,6 +62,11 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(Long user1, Long user2) {
-       return userDbStorage.getMutualFriends(user1, user2);
+        List<User> mutualFriends = userDbStorage.getMutualFriends(user1, user2);
+        if (mutualFriends.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return mutualFriends;
     }
 }

@@ -16,13 +16,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ErrorHandler {
 
-//    @ExceptionHandler(ValidationException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse validationError(final ValidationException e) {
-//        log.error("ERROR[400]: Произошла ошибка ValidationException: {}", e.getMessage());
-//        return new ErrorResponse(e.getMessage());
-//    }
-
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFoundError(final NotFoundException e) {

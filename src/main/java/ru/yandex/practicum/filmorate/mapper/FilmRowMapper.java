@@ -4,15 +4,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.modelFilm.Film;
-import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
-import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @Component
 public class FilmRowMapper implements RowMapper<Film>, Serializable {
@@ -34,38 +31,10 @@ public class FilmRowMapper implements RowMapper<Film>, Serializable {
                 rs.getString("description"),
                 rs.getObject("releaseDate", LocalDate.class),
                 rs.getInt("duration"),
-                getUserLikes(id),
-                getGenreFilm(genreId),
-                getRatingFilm(ratingId)
-
+                null,
+                null,
+                null
         );
     }
 
-    private Set<Long> getUserLikes(Long filmId) {
-        String sql = "SELECT user_id FROM user_likes WHERE movie_id = ?";
-        return new HashSet<>(jdbcTemplate.query(
-                sql,
-                (rs, rowNum) ->
-                        rs.getLong("user_id"), filmId)
-        );
-    }
-
-    private GenreFilm getGenreFilm(Long genreId) {
-        String sql = "SELECT id, genre_name FROM movie_genre WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNumber) ->
-            new GenreFilm(
-                    rs.getInt("id"),
-                    rs.getString("genre_name")
-            ), genreId
-        );
-    }
-
-    private RatingFilm getRatingFilm(int ratingId) {
-        String sql = "SELECT * FROM movie_rating WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
-                new RatingFilm(
-                        rs.getInt("id"),
-                        rs.getString("rating")
-                ), ratingId);
-    }
 }
