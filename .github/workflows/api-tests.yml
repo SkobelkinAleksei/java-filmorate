@@ -5,4 +5,4 @@ on:
 
 jobs:
   build:
-    uses: yandex-praktikum/java-filmorate/.github/workflows/api-tests.yml@c
+    uses: yandex-praktikum/java-filmorate/.github/workflows/api-tests.yml@ci
