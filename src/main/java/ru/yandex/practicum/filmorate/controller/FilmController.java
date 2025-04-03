@@ -17,6 +17,8 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
+
+
     // Получение всех фильмов.
     @GetMapping
     public Collection<Film> findAll() {
