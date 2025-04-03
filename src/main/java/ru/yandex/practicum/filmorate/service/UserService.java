@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -25,12 +26,14 @@ public class UserService {
     }
 
     public User getUser(long userId) {
-        return userDbStorage.getUser(userId).orElseThrow(
-                () -> new IllegalStateException("User with id %s not found".formatted(userId))
-        );
+        User user = userDbStorage.getUser(userId);
+        if (user == null) {
+            throw new NotFoundException("User  with id %s not found".formatted(userId));
+        }
+        return user;
     }
 
-    public int create(User user) {
+    public User create(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Емаил не может быть пустым");
         }
@@ -45,12 +48,21 @@ public class UserService {
         return userDbStorage.getFriends(userId);
     }
 
-    public boolean addFriend(Long userId, Long friendId) {
+    public boolean addFriend(long userId, long friendId) {
+        // проверка, что такой юзер есть
+        userDbStorage.isCorrectUser(userId);
         userDbStorage.isCorrectUser(friendId);
+
+        // Проверка, что пользователь не является другом
         if (userDbStorage.isUserExistFriend(userId, friendId)) {
             throw new IllegalArgumentException("User with id = %s already exist friend with id = %s".formatted(userId, friendId));
         }
-        return userDbStorage.addFriend(userId, friendId);
+
+        // Добавление в друзья
+        boolean userAdded = userDbStorage.addFriend(userId, friendId);
+        boolean friendAdded = userDbStorage.addFriend(friendId, userId);
+
+        return userAdded && friendAdded; // Возвращаем true, если оба добавлены
     }
 
     public boolean removeFriend(long userId, long friendId) {
@@ -60,7 +72,7 @@ public class UserService {
         return userDbStorage.removeFriend(userId, friendId);
     }
 
-    public List<User> getMutualFriends(Long user1, Long user2) {
+    public List<User> getMutualFriends(long user1, long user2) {
         List<User> mutualFriends = userDbStorage.getMutualFriends(user1, user2);
         if (mutualFriends.isEmpty()) {
             return Collections.emptyList();

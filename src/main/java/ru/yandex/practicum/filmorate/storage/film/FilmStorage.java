@@ -4,21 +4,20 @@ import jakarta.validation.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public interface FilmStorage {
 
     Collection<Film> findAll();
 
-    boolean addLike(Long filmId, Long userId);
+    boolean addLike(long filmId, long userId);
 
-    boolean removeLike(Long filmId, Long userId);
+    boolean removeLike(long filmId, long userId);
 
     Collection<Film> getTopMovies();
 
-    Optional<Film> getFilm(Long filmId);
+    Film getFilm(long filmId);
 
-    int createFilm(Film film) throws ValidationException;
+    Film createFilm(Film film) throws ValidationException;
 
-    Optional<Film> update(Film newFilm);
+    Film update(Film newFilm);
 }

@@ -32,21 +32,27 @@ public class FilmService {
 
     public boolean addLike(Long filmId, Long userId) {
         log.info("Добавление лайка: фильм с id {} от пользователя с id {}", filmId, userId);
-        User user = userDbStorage.getUser(userId).orElseThrow(
-                () -> new EntityNotFoundException("User with id %s not found!".formatted(userId))
-        );
+
+        User user = userDbStorage.getUser(userId);
+        if (user == null) {
+            throw new EntityNotFoundException("User with id %s not found!".formatted(userId));
+        }
 
         return filmDbStorage.addLike(filmId, user.getId());
     }
 
     public boolean removeLike(Long filmId, Long userId) {
         log.info("Удаление лайка: фильм с id {} от пользователя с id {}", filmId, userId);
-        User user = userDbStorage.getUser(userId).orElseThrow(
-                () -> new EntityNotFoundException("User with id %s not found!".formatted(userId))
-        );
-        Film film = filmDbStorage.getFilm(filmId).orElseThrow(
-                () -> new EntityNotFoundException("Film with id %s not found!".formatted(filmId))
-        );
+
+        User user = userDbStorage.getUser(userId);
+        if (user == null) {
+            throw new EntityNotFoundException("User with id %s not found!".formatted(userId));
+        }
+
+        Film film = filmDbStorage.getFilm(filmId);
+        if (film == null) {
+            throw new EntityNotFoundException("Film with id %s not found!".formatted(filmId));
+        }
 
         return filmDbStorage.removeLike(film.getId(), user.getId());
     }
@@ -61,14 +67,18 @@ public class FilmService {
         return topMovies;
     }
 
-    public Film getFilm(Long filmId) {
+    public Film getFilm(long filmId) {
         log.info("Запрос информации о фильме с id {}", filmId);
-        return filmDbStorage.getFilm(filmId).orElseThrow(
-                () -> new IllegalArgumentException("Фильм с id %s не найден".formatted(filmId))
-        );
+
+        Film film = filmDbStorage.getFilm(filmId);
+        if (film == null) {
+            throw new IllegalArgumentException("Фильм с id %s не найден".formatted(filmId));
+        }
+
+        return film;
     }
 
-    public int createFilm(Film film) {
+    public Film createFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new IllegalArgumentException("Название фильма не может быть пустым");
         }
@@ -83,9 +93,14 @@ public class FilmService {
         if (newFilm.getId() == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
         }
+
         log.info("Обновление фильма: {}", newFilm);
-        return filmDbStorage.update(newFilm).orElseThrow(
-                () -> new IllegalArgumentException("Фильм с id %s не найден".formatted(newFilm.getId()))
-        );
+
+        Film updatedFilm = filmDbStorage.update(newFilm); // Предполагаем, что этот метод теперь возвращает Film или null
+        if (updatedFilm == null) {
+            throw new IllegalArgumentException("Фильм с id %s не найден".formatted(newFilm.getId()));
+        }
+
+        return updatedFilm;
     }
 }

@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ import java.util.*;
 
 @Slf4j
 @Repository
+@Qualifier("userDbStorage")
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -28,7 +30,7 @@ public class UserDbStorage implements UserStorage {
             VALUES(?, ?, NOW())
             """;
     private static final String INSERT_USER = """
-            INSERT INTO users (name, email, login, birthday)
+            INSERT INTO users (login, name, email, birthday)
             VALUES (?, ?, ?, ?)
             """;
     private static final String CHECK_EMAIL_EXISTS = "SELECT (COUNT(*) > 0) FROM users WHERE email = ?";
@@ -43,6 +45,11 @@ public class UserDbStorage implements UserStorage {
             JOIN users AS u ON u.id = f.friend_id
             WHERE f.user_id = ?
             """;
+    private static final String REMOVE_FRIEND = """
+            DELETE FROM friends
+            WHERE user_id = ?
+            AND friend_id = ?
+            """;
     private static final String FIND_MUTUAL_FRIENDS = """
             SELECT u.*
             FROM friends AS f1
@@ -51,13 +58,17 @@ public class UserDbStorage implements UserStorage {
             WHERE f1.user_id = ?
             AND f2.user_id = ?
             """;
+    private static final String IS_CORRECT_USER = """
+            SELECT (COUNT(*) > 0)
+            FROM users
+            WHERE users.id = ?
+            """;
 
     private static final String IS_USER_EXISTS_FRIENDS = "SELECT (COUNT(*) > 0) FROM friends AS f WHERE user_id = ? AND friend_id = ?";
 
     @Autowired
     public UserDbStorage(
             JdbcTemplate jdbcTemplate
-
     ) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -69,82 +80,81 @@ public class UserDbStorage implements UserStorage {
                 rs.getString("name"),
                 rs.getString("email"),
                 rs.getString("login"),
-                rs.getObject("birthday", LocalDate.class),
-                new HashMap<>()
+                rs.getObject("birthday", LocalDate.class)
         ));
     }
 
     @Override
-    public Optional<User> getUser(long userId) {
+    public User getUser(long userId) {
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(FIND_USER_BY_ID, (rs, rowNum) -> new User(
+            return jdbcTemplate.queryForObject(FIND_USER_BY_ID, (rs, rowNum) -> new User(
                     rs.getLong("id"),
                     rs.getString("name"),
                     rs.getString("email"),
                     rs.getString("login"),
-                    rs.getObject("birthday", LocalDate.class),
-                    new HashMap<>()
-            ), userId));
+                    rs.getObject("birthday", LocalDate.class)
+            ), userId);
         } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
     @Override
-    public int create(User user) {
+    public User create(User user) {
+        log.info("Данные для создания пользователя = %s".formatted(user));
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getName());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getLogin());
-            ps.setString(4, user.getBirthday().toString());
+            ps.setString(1, user.getLogin()); // логин
+            ps.setString(2, user.getName()); // имя
+            ps.setString(3, user.getEmail()); // email
+            ps.setString(4, user.getBirthday().toString()); // день рождения
             return ps;
         }, keyHolder);
+        user.setId(keyHolder.getKey().longValue());
 
-        return keyHolder.getKey().intValue();
-    }
-
-    public void duplMailCheck(User user) {
-        Boolean isExist = jdbcTemplate.queryForObject(CHECK_EMAIL_EXISTS, Boolean.class, user.getEmail());
-        if (isExist) {
-            throw new IllegalArgumentException("User with email = %s already exists".formatted(user.getEmail()));
-        }
+        return user;
     }
 
     @Override
     public User update(User newUser) {
         log.info("Данные для обновления пользователя = %s".formatted(newUser));
-        jdbcTemplate.update(UPDATE_USER, newUser.getName(), newUser.getEmail(), newUser.getLogin(), newUser.getBirthday(), newUser.getId());
+        jdbcTemplate.update(UPDATE_USER, newUser.getLogin(), newUser.getName(), newUser.getEmail(), newUser.getBirthday(), newUser.getId());
 
-        return getUser(newUser.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Пользователь с id = %s не найден!".formatted(newUser.getId()))
-        );
+        User updatedUser = getUser(newUser.getId());
+
+        if (updatedUser == null) {
+            throw new NotFoundException("Пользователь с id = %s не найден!".formatted(newUser.getId())); // Измените на NotFoundException
+        }
+
+        return updatedUser;
     }
 
     @Override
     public List<User> getFriends(long userId) {
-        return jdbcTemplate.query(FIND_FRIENDS, (rs, rowNum) -> new User(
+        List<User> friends = jdbcTemplate.query(FIND_FRIENDS, (rs, rowNum) -> new User(
                 rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("email"),
                 rs.getString("login"),
-                rs.getObject("birthday", LocalDate.class),
-                new HashMap<>()
+                rs.getObject("birthday", LocalDate.class)
         ), userId);
+
+        // Проверка, есть ли друзья
+        if (friends.isEmpty()) {
+            throw new IllegalArgumentException("У пользователя с ID " + userId + " нет друзей.");
+        }
+
+        return friends;
     }
 
     public boolean isUserExistFriend(long userId, long friendId) {
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(IS_USER_EXISTS_FRIENDS, Boolean.class, userId, friendId));
+        Boolean exists = jdbcTemplate.queryForObject(IS_USER_EXISTS_FRIENDS, Boolean.class, userId, friendId);
+        return Boolean.TRUE.equals(exists);
     }
 
     public void isCorrectUser(Long userId) {
-        String sql = """
-                SELECT (COUNT(*) > 0)
-                 FROM users
-                 WHERE users.id = ?
-                """;
-        Boolean isExist = jdbcTemplate.queryForObject(sql, Boolean.class, userId);
+        Boolean isExist = jdbcTemplate.queryForObject(IS_CORRECT_USER, Boolean.class, userId);
 
         if (Boolean.FALSE.equals(isExist)) {
             throw new IllegalArgumentException("Такого User не существует %s".formatted(userId));
@@ -160,22 +170,18 @@ public class UserDbStorage implements UserStorage {
     @Override
     public boolean removeFriend(long userId, long friendId) {
         isUserExistFriend(userId, friendId);
-        String sql = "DELETE FROM friends " +
-                "WHERE user_id = ? " +
-                "AND friend_id = ?";
-        jdbcTemplate.update(sql, userId, friendId);
+        jdbcTemplate.update(REMOVE_FRIEND, userId, friendId);
         return true;
     }
 
     @Override
-    public List<User> getMutualFriends(Long user1, Long user2) {
+    public List<User> getMutualFriends(long user1, long user2) {
         return jdbcTemplate.query(FIND_MUTUAL_FRIENDS, (rs, rowNum) -> new User(
                 rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("email"),
                 rs.getString("login"),
-                rs.getObject("birthday", LocalDate.class),
-                new HashMap<>()
+                rs.getObject("birthday", LocalDate.class)
         ), user1, user2);
     }
 

@@ -66,12 +66,12 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public boolean addLike(Long filmId, Long userId) {
+    public boolean addLike(long filmId, long userId) {
         return jdbcTemplate.update(ADD_LIKE, userId, filmId) > 0;
     }
 
     @Override
-    public boolean removeLike(Long filmId, Long userId) {
+    public boolean removeLike(long filmId, long userId) {
         return jdbcTemplate.update(REMOVE_LIKE, userId, filmId) > 0;
     }
 
@@ -90,8 +90,8 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getFilm(Long filmId) {
-        return jdbcTemplate.query(FIND_MOVIE_BY_ID, (rs, rowNum) -> new Film(
+    public Film getFilm(long filmId) {
+        List<Film> films = jdbcTemplate.query(FIND_MOVIE_BY_ID, (rs, rowNum) -> new Film(
                 rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("description"),
@@ -100,27 +100,28 @@ public class FilmDbStorage implements FilmStorage {
                 null,
                 getGenreFilm(rs.getLong("genre_id")),
                 getRatingFilm(rs.getInt("rating_id"))
-        ), filmId).stream().findFirst();
+        ), filmId);
+
+        // Проверяем, найден ли фильм
+        if (films.isEmpty()) {
+            return null; // Или выбросьте исключение, если хотите
+        }
+
+        return films.getFirst();
     }
 
+
     @Override
-    public int createFilm(Film film) {
-        log.info("Film info before creating %s".formatted(film));
+    public Film createFilm(Film film) {
+        log.info("Film info before creating: {}", film);
 
-        Integer genreId = film.getGenre() != null ? film.getGenre().getId() : null;
-        if (genreId == null) {
-            throw new ValidationException("Жанр не найден");
-        }
+        Integer genreId = Optional.ofNullable(film.getGenre())
+                .map(GenreFilm::getId)
+                .orElseThrow(() -> new ValidationException("Жанр не найден"));
 
-        Integer ratingId = film.getRating() != null ? film.getRating().getId() : null;
-        if (ratingId == null) {
-            throw new ValidationException("Рейтинг не найден");
-        }
-//        Integer genreId = jdbcTemplate.query(CHECK_GENRE_EXISTS, (rs, rowNum) -> rs.getInt("id"), film.getGenreId())
-//                .stream().findFirst().orElseThrow(() -> new ValidationException("Жанр не найден"));
-//
-//        Integer ratingId = jdbcTemplate.query(CHECK_RATING_EXISTS, (rs, rowNum) -> rs.getInt("id"), film.getRatingId())
-//                .stream().findFirst().orElseThrow(() -> new ValidationException("Рейтинг не найден"));
+        Integer ratingId = Optional.ofNullable(film.getRating())
+                .map(RatingFilm::getId)
+                .orElseThrow(() -> new ValidationException("Рейтинг не найден"));
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -134,11 +135,13 @@ public class FilmDbStorage implements FilmStorage {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().intValue();
+        film.setId(keyHolder.getKey().longValue());
+
+        return film;
     }
 
     @Override
-    public Optional<Film> update(Film newFilm) {
+    public Film update(Film newFilm) {
         int updatedRows = jdbcTemplate.update(UPDATE_MOVIE,
                 newFilm.getName(),
                 newFilm.getDescription(),
@@ -148,7 +151,11 @@ public class FilmDbStorage implements FilmStorage {
                 newFilm.getRating().getId(),
                 newFilm.getId());
 
-        return updatedRows > 0 ? getFilm(newFilm.getId()) : Optional.empty();
+        if (updatedRows > 0) {
+            return getFilm(newFilm.getId());
+        } else {
+            throw new IllegalArgumentException("Фильм с id %s не найден".formatted(newFilm.getId()));
+        }
     }
 
     private RatingFilm getRatingFilm(int ratingId) {
@@ -159,7 +166,7 @@ public class FilmDbStorage implements FilmStorage {
                 ), ratingId);
     }
 
-    private GenreFilm getGenreFilm(Long genreId) {
+    private GenreFilm getGenreFilm(long genreId) {
         return jdbcTemplate.queryForObject(FIND_GENRE_BY_ID, (rs, rowNumber) ->
                 new GenreFilm(
                         rs.getInt("id"),

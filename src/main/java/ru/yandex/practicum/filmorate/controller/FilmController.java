@@ -32,7 +32,7 @@ public class FilmController {
     // Добавляем фильм
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public int createFilm(@RequestBody @Valid Film film) {
+    public Film createFilm(@RequestBody @Valid Film film) {
         return filmService.createFilm(film);
     }
 
@@ -44,14 +44,14 @@ public class FilmController {
 
     // Ставим лайк фильму
     @PutMapping("/{filmId}/like/{userId}")
-    public boolean addLike(@PathVariable Long filmId, @PathVariable Long userId) throws NotFoundException {
+    public boolean addLike(@PathVariable long filmId, @PathVariable long userId) throws NotFoundException {
         return filmService.addLike(filmId, userId);
     }
 
     //  пользователь удаляет лайк
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{filmId}/like/{userId}")
-    public boolean removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
+    public boolean removeLike(@PathVariable long filmId, @PathVariable long userId) {
         return filmService.removeLike(filmId, userId);
     }
 
