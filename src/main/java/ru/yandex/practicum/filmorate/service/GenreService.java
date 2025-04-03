@@ -28,5 +28,4 @@ public class GenreService {
     public List<GenreFilm> getGenresOfFilm(Long filmId) {
         return genreFilmStorage.getGenresOfFilm(filmId);
     }
-
 }

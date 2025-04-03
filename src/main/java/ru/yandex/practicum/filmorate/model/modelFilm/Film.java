@@ -61,7 +61,6 @@ public class Film {
         this.rating = rating;
     }
 
-
     public Film(Long id, String name, String description,
                 LocalDate releaseDate, int duration) {
         this.id = id;

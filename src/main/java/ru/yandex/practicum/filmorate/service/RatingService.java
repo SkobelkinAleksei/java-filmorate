@@ -19,5 +19,4 @@ public class RatingService {
     public String getRating(Integer id) {
         return ratingFilm.getRating(id);
     }
-
 }
