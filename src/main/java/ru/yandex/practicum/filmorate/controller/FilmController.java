@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.modelFilm.Film;
 import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
 import java.util.Collection;
 
 @Slf4j
@@ -18,7 +17,6 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
-
     // Получение всех фильмов.
     @GetMapping
     public Collection<Film> findAll() {
