@@ -7,7 +7,6 @@ public class ExceptionMessages {
     public static final String LOGIN_CANNOT_BE_EMPTY = "Логин не может быть пуст и не должен содержать пробелы";
     public static final String BIRTHDAY_CANNOT_BE_IN_FUTURE = "Дата рождения не может быть в будущем времени";
     public static final String BIRTHDAY_CANNOT_BE_NULL = "Дата рождения не может быть пустой";
-    public static final String USER_NOT_FOUND = "Пользователь null";
 
     //ValidationException фильмы
     public static final String FILM_NAME_CANNOT_BE_EMPTY = "Название фильма должно быть указано";
@@ -15,7 +14,6 @@ public class ExceptionMessages {
     public static final String FILM_DESCRIPTION_TOO_LONG = "Описание фильма пустое или превышает 200 символов";
     public static final String FILM_RELEASE_DATE_IS_INCORRECT = "Дата релиза фильма не может быть раньше 28.12.1895г.";
     public static final String FILM_ID_CANNOT_BE_NULL = "ID фильма не может быть null";
-    public static final String FILM_NOT_FOUND = "Фильм с id не удалось найти";
     public static final String FILM_NOT_A_GENRE = "Фильм должен иметь хотя бы один жанр";
     public static final String FILM_NOT_A_RATING = "Фильм должен иметь рейтинг";
 
