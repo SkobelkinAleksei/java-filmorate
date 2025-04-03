@@ -18,7 +18,7 @@ import java.util.Collection;
 public class FilmController {
     private final FilmService filmService;
 
-    // Получение всех фильмов.
+    // Получение всех фильмов
     @GetMapping
     public Collection<Film> findAll() {
         return filmService.findAll();
