@@ -6,8 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.modelUser.User;
-import ru.yandex.practicum.filmorate.model.modelUser.UserCreate;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -35,7 +34,7 @@ public class UserController {
     // Добавляем Пользователя
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public int create(@RequestBody @Valid UserCreate user) {
+    public int create(@RequestBody @Valid User user) {
         return userService.create(user);
     }
 

@@ -9,8 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.mapper.UserFriendsRowMapper;
 import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
-import ru.yandex.practicum.filmorate.model.modelUser.User;
-import ru.yandex.practicum.filmorate.model.modelUser.UserCreate;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
@@ -28,21 +27,22 @@ public class UserDbStorageTest {
     @Autowired
     private UserDbStorage userDbStorage;
 
-    private UserCreate userCreate;
+    private User user;
 
     @BeforeEach
     void setUp() {
-        userCreate = new UserCreate(
+        user = new User(
+                null,
                 "TestUser",
-                "testlogin",
                 "test@example.com",
+                "testlogin",
                 LocalDate.of(1990, 1, 1)
         );
     }
 
     @Test
     void testCreateUser() {
-        int userId = userDbStorage.create(userCreate);
+        int userId = userDbStorage.create(user);
 
         Optional<User> createdUser = userDbStorage.getUser(userId);
         assertThat(createdUser)
@@ -55,7 +55,7 @@ public class UserDbStorageTest {
 
     @Test
     void testGetUserById() {
-        int userId = userDbStorage.create(userCreate);
+        int userId = userDbStorage.create(user);
 
         Optional<User> userOptional = userDbStorage.getUser(userId);
 
@@ -76,7 +76,7 @@ public class UserDbStorageTest {
 
     @Test
     void testUpdateUser() {
-        int userId = userDbStorage.create(userCreate);
+        int userId = userDbStorage.create(user);
         User user = userDbStorage.getUser(userId).get();
 
         user.setName("UpdatedUser");
@@ -92,7 +92,8 @@ public class UserDbStorageTest {
 
     @Test
     void testUpdateUserNotFound() {
-        User user = new User(999L,
+        User user = new User(
+                999L,
                 "NonExistent",
                 "nonexistent@example.com",
                 "nonexistentlogin",
@@ -104,13 +105,14 @@ public class UserDbStorageTest {
 
     @Test
     void testAddFriend() {
-        UserCreate userCreate2 = new UserCreate(
+        User userCreate2 = new User(
+                null,
                 "FriendUser",
                 "friendlogin",
                 "friend@example.com",
                 LocalDate.of(1990, 2, 2)
         );
-        int userId1 = userDbStorage.create(userCreate);
+        int userId1 = userDbStorage.create(user);
         int userId2 = userDbStorage.create(userCreate2);
 
         boolean result = userDbStorage.addFriend(userId1, userId2);
@@ -120,13 +122,14 @@ public class UserDbStorageTest {
 
     @Test
     void testRemoveFriend() {
-        UserCreate userCreate2 = new UserCreate(
+        User userCreate2 = new User(
+                null,
                 "FriendUser",
                 "friendlogin",
                 "friend@example.com",
                 LocalDate.of(1990, 2, 2)
         );
-        int userId1 = userDbStorage.create(userCreate);
+        int userId1 = userDbStorage.create(user);
         int userId2 = userDbStorage.create(userCreate2);
 
         userDbStorage.addFriend(userId1, userId2);
@@ -137,13 +140,14 @@ public class UserDbStorageTest {
 
     @Test
     void testGetFriends() {
-        UserCreate userCreate2 = new UserCreate(
+        User userCreate2 = new User(
+                null,
                 "FriendUser",
                 "friendlogin",
                 "friend@example.com",
                 LocalDate.of(1990, 2, 2)
         );
-        int userId1 = userDbStorage.create(userCreate);
+        int userId1 = userDbStorage.create(user);
         int userId2 = userDbStorage.create(userCreate2);
 
         userDbStorage.addFriend(userId1, userId2);
@@ -156,20 +160,22 @@ public class UserDbStorageTest {
 
     @Test
     void testGetMutualFriends() {
-        UserCreate userCreate2 = new UserCreate(
+        User userCreate2 = new User(
+                null,
                 "FriendUser1",
                 "friendlogin1",
                 "friend1@example.com",
                 LocalDate.of(1990, 2, 2)
         );
 
-        UserCreate userCreate3 = new UserCreate(
+        User userCreate3 = new User(
+                null,
                 "FriendUser2",
                 "friendlogin2",
                 "friend2@example.com",
                 LocalDate.of(1990, 3, 3)
         );
-        long userId1 = userDbStorage.create(userCreate);
+        long userId1 = userDbStorage.create(user);
         long userId2 = userDbStorage.create(userCreate2);
         long userId3 = userDbStorage.create(userCreate3);
 

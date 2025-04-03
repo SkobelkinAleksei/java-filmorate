@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.mapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.modelFilm.Film;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.io.Serializable;
 import java.sql.ResultSet;

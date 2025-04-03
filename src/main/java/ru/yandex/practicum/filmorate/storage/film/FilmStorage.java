@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import jakarta.validation.ValidationException;
-import ru.yandex.practicum.filmorate.model.modelFilm.Film;
-import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -19,7 +18,7 @@ public interface FilmStorage {
 
     Optional<Film> getFilm(Long filmId);
 
-    int createFilm(FilmCreate film) throws ValidationException;
+    int createFilm(Film film) throws ValidationException;
 
     Optional<Film> update(Film newFilm);
 }

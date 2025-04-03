@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model.modelFilm;
+package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,21 +34,6 @@ public class Film {
 
     private RatingFilm rating;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
-    public Film() {
-    }
-
-    public Film(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public Film(Long id, String name, String description,
                 LocalDate releaseDate, int duration, Set<Long> userLikes, GenreFilm genre, RatingFilm rating) {
         this.id = id;
@@ -59,14 +44,5 @@ public class Film {
         this.userLikes = userLikes;
         this.genre = genre;
         this.rating = rating;
-    }
-
-    public Film(Long id, String name, String description,
-                LocalDate releaseDate, int duration) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
     }
 }

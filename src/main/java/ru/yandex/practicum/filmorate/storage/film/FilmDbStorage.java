@@ -7,8 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.modelFilm.Film;
-import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -105,14 +104,23 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public int createFilm(FilmCreate film) {
+    public int createFilm(Film film) {
         log.info("Film info before creating %s".formatted(film));
 
-        Integer genreId = jdbcTemplate.query(CHECK_GENRE_EXISTS, (rs, rowNum) -> rs.getInt("id"), film.getGenreId())
-                .stream().findFirst().orElseThrow(() -> new ValidationException("Жанр не найден"));
+        Integer genreId = film.getGenre() != null ? film.getGenre().getId() : null;
+        if (genreId == null) {
+            throw new ValidationException("Жанр не найден");
+        }
 
-        Integer ratingId = jdbcTemplate.query(CHECK_RATING_EXISTS, (rs, rowNum) -> rs.getInt("id"), film.getRatingId())
-                .stream().findFirst().orElseThrow(() -> new ValidationException("Рейтинг не найден"));
+        Integer ratingId = film.getRating() != null ? film.getRating().getId() : null;
+        if (ratingId == null) {
+            throw new ValidationException("Рейтинг не найден");
+        }
+//        Integer genreId = jdbcTemplate.query(CHECK_GENRE_EXISTS, (rs, rowNum) -> rs.getInt("id"), film.getGenreId())
+//                .stream().findFirst().orElseThrow(() -> new ValidationException("Жанр не найден"));
+//
+//        Integer ratingId = jdbcTemplate.query(CHECK_RATING_EXISTS, (rs, rowNum) -> rs.getInt("id"), film.getRatingId())
+//                .stream().findFirst().orElseThrow(() -> new ValidationException("Рейтинг не найден"));
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {

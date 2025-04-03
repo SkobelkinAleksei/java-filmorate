@@ -7,15 +7,17 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.mapper.FilmRowMapper;
-import ru.yandex.practicum.filmorate.model.modelFilm.Film;
-import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
-import ru.yandex.practicum.filmorate.model.modelUser.UserCreate;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
+import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,29 +29,40 @@ public class FilmDbStorageTest {
     @Autowired
     private FilmDbStorage filmDbStorage;
 
-    private FilmCreate filmCreate;
-    private UserCreate userCreate;
-    private UserCreate userCreate2;
+    private Film filmCreate;
+    private Film filmCreate2;
+    private User userCreate;
+    private User userCreate2;
     @Autowired
     private UserDbStorage userDbStorage;
 
     @BeforeEach
     public void setUp() {
-        filmCreate = new FilmCreate(
+        // Инициализация жанра
+        GenreFilm genre = new GenreFilm(1, "COMEDY");
+
+        // Инициализация рейтинга
+        RatingFilm rating = new RatingFilm(2, "PG");
+
+        filmCreate = new Film(
+                null,
+                "Name Film",
                 "Test movie",
-                "A description of the movie",
                 LocalDate.of(2005, 1, 1),
                 100,
-                2,
-                1
+                Set.of(),
+                genre,
+                rating
         );
-        userCreate = new UserCreate(
+        userCreate = new User(
+                null,
                 "TestUser",
                 "testlogin",
                 "test@example.com",
                 LocalDate.of(1990, 1, 1)
         );
-        userCreate2 = new UserCreate(
+        userCreate2 = new User(
+                null,
                 "TestUser2",
                 "testlogin2",
                 "test2@example.com",
@@ -63,7 +76,7 @@ public class FilmDbStorageTest {
         List<Film> allMovies = filmDbStorage.findAll();
 
         assertThat(allMovies).isNotEmpty();
-        assertThat(allMovies).anyMatch(film -> film.getName().equals("Test movie"));
+        assertThat(allMovies).anyMatch(film -> film.getName().equals("Name Film"));
     }
 
     @Test
@@ -75,7 +88,7 @@ public class FilmDbStorageTest {
         assertThat(createdFilm).isPresent()
                 .hasValueSatisfying(film -> {
                     assertThat(film).hasFieldOrPropertyWithValue("id", (long) filmId);
-                    assertThat(film).hasFieldOrPropertyWithValue("name", "Test movie");
+                    assertThat(film).hasFieldOrPropertyWithValue("name", "Name Film");
                 });
     }
 
@@ -88,7 +101,7 @@ public class FilmDbStorageTest {
         assertThat(filmOptional).isPresent()
                 .hasValueSatisfying(film -> {
                     assertThat(film).hasFieldOrPropertyWithValue("id", (long) filmId);
-                    assertThat(film).hasFieldOrPropertyWithValue("name", "Test movie");
+                    assertThat(film).hasFieldOrPropertyWithValue("name", "Name Film");
                 });
     }
 
@@ -141,14 +154,20 @@ public class FilmDbStorageTest {
         long userId1 = userDbStorage.create(userCreate);
         long userId2 = userDbStorage.create(userCreate2);
 
+        // Инициализация жанра
+        GenreFilm genre = new GenreFilm(2, "DRAMA");
+        // Инициализация рейтинга
+        RatingFilm rating = new RatingFilm(2, "PG");
 
-        FilmCreate filmCreate2 = new FilmCreate(
+        filmCreate2 = new Film(
+                null,
+                "Name film",
                 "Another Movie",
-                "Another description",
                 LocalDate.of(2021, 1, 1),
-                90,
-                1,
-                2
+                199,
+                Set.of(),
+                genre,
+                rating
         );
 
         int filmId1 = filmDbStorage.createFilm(filmCreate);

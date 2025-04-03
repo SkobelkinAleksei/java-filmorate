@@ -4,9 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.modelFilm.Film;
-import ru.yandex.practicum.filmorate.model.modelFilm.FilmCreate;
-import ru.yandex.practicum.filmorate.model.modelUser.User;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
@@ -69,7 +68,7 @@ public class FilmService {
         );
     }
 
-    public int createFilm(FilmCreate film) {
+    public int createFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new IllegalArgumentException("Название фильма не может быть пустым");
         }

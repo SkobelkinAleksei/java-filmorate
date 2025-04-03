@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model.modelUser;
+package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -43,14 +43,6 @@ public class User {
         this.email = email;
         this.login = login;
         this.birthday = birthday;
-    }
-
-    public User(String name, LocalDate birthday) {
-        this.name = name;
-        this.birthday = birthday;
-    }
-
-    public User() {
     }
 
     public User(Long id, String name, String email, String login, LocalDate birthday, Map<Long, StatusFriend> friendIds) {
