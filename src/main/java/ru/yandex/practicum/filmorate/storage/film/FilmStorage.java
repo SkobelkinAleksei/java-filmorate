@@ -4,6 +4,7 @@ import jakarta.validation.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface FilmStorage {
 
@@ -15,7 +16,7 @@ public interface FilmStorage {
 
     Collection<Film> getTopMovies();
 
-    Film getFilm(long filmId);
+    Optional<Film> getFilm(long filmId);
 
     Film createFilm(Film film) throws ValidationException;
 

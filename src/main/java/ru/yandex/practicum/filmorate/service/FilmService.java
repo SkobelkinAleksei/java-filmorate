@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
@@ -49,10 +50,9 @@ public class FilmService {
             throw new EntityNotFoundException("User with id %s not found!".formatted(userId));
         }
 
-        Film film = filmDbStorage.getFilm(filmId);
-        if (film == null) {
-            throw new EntityNotFoundException("Film with id %s not found!".formatted(filmId));
-        }
+        Film film = filmDbStorage.getFilm(filmId).orElseThrow(
+                () -> new NotFoundException("Фильм не найден! %s".formatted(filmId))
+        );
 
         return filmDbStorage.removeLike(film.getId(), user.getId());
     }
@@ -70,12 +70,9 @@ public class FilmService {
     public Film getFilm(long filmId) {
         log.info("Запрос информации о фильме с id {}", filmId);
 
-        Film film = filmDbStorage.getFilm(filmId);
-        if (film == null) {
-            throw new IllegalArgumentException("Фильм с id %s не найден".formatted(filmId));
-        }
-
-        return film;
+        return filmDbStorage.getFilm(filmId).orElseThrow(
+                () -> new NotFoundException("Фильм не найден! %s". formatted(filmId))
+        );
     }
 
     public Film createFilm(Film film) {

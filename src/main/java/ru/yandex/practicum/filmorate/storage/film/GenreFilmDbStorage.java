@@ -41,11 +41,11 @@ public class GenreFilmDbStorage implements GenreFilmStorage {
 
     @Override
     public GenreFilm getById(long id) {
-        try {
-            return jdbcTemplate.queryForObject(GET_BY_ID_GENRE, genreFilmRowMapper, id);
-        } catch (EmptyResultDataAccessException e) {
-            return null; // Возвращаем null, если жанр не найден
-        }
+        return (GenreFilm) jdbcTemplate.query(GET_BY_ID_GENRE, (rs, rowNum) ->
+                new GenreFilm(
+                        rs.getInt("id"),
+                        rs.getString("genre_name")
+                ), id);
     }
 
     @Override

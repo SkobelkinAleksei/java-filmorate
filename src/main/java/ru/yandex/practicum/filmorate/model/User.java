@@ -13,6 +13,7 @@ import lombok.Setter;
 import ru.yandex.practicum.filmorate.storage.user.StatusFriend;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -37,10 +38,9 @@ public class User {
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    private Map<Long, StatusFriend> friendIds;
+    private List<Long> friendIds;
 
-    public User() {
-    }
+    public User() {}
 
     public User(Long id, String login, String name, String email, LocalDate birthday) {
         this.id = id;
@@ -50,7 +50,7 @@ public class User {
         this.birthday = birthday;
     }
 
-    public User(Long id, String name, String email, String login, LocalDate birthday, Map<Long, StatusFriend> friendIds) {
+    public User(Long id, String name, String email, String login, LocalDate birthday, List<Long> friendIds) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -58,4 +58,5 @@ public class User {
         this.birthday = birthday;
         this.friendIds = friendIds;
     }
+
 }

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -13,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 @Slf4j
-@Data
 public class GenreService {
     private final GenreFilmDbStorage genreFilmStorage;
 

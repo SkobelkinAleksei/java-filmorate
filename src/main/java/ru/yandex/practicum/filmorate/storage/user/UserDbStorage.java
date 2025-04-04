@@ -63,7 +63,7 @@ public class UserDbStorage implements UserStorage {
             WHERE users.id = ?
             """;
 
-    private static final String IS_USER_EXISTS_FRIENDS = "SELECT (COUNT(*) > 0) FROM friends AS f WHERE user_id = ? AND friend_id = ?";
+    private static final String IS_USER_EXISTS_FRIENDS = "SELECT (COUNT(*) > 0) FROM friends AS f WHERE f.user_id = ? AND f.friend_id = ?";
 
     @Autowired
     public UserDbStorage(
@@ -75,11 +75,12 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> findAll() {
       return  jdbcTemplate.query(FIND_ALL_USERS, (rs, rowNum) -> new User(
-             rs.getLong("id"),
+                rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("email"),
                 rs.getString("login"),
-                rs.getObject("birthday", LocalDate.class)
+                rs.getObject("birthday", LocalDate.class),
+                getFriends(rs.getLong("id")).stream().map(User::getId).toList()
         ));
     }
 
@@ -91,7 +92,8 @@ public class UserDbStorage implements UserStorage {
                     rs.getString("name"),
                     rs.getString("email"),
                     rs.getString("login"),
-                    rs.getObject("birthday", LocalDate.class)
+                    rs.getObject("birthday", LocalDate.class),
+                    getFriends(rs.getLong("id")).stream().map(User::getId).toList()
             ), userId);
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -107,7 +109,7 @@ public class UserDbStorage implements UserStorage {
             ps.setString(1, user.getLogin()); // логин
             ps.setString(2, user.getName()); // имя
             ps.setString(3, user.getEmail()); // email
-            ps.setString(4, user.getBirthday().toString()); // день рождения
+            ps.setString(4, user.getBirthday().toString());// день рождения
             return ps;
         }, keyHolder);
         user.setId(keyHolder.getKey().longValue());
@@ -117,59 +119,49 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User newUser) {
-        log.info("Данные для обновления пользователя = %s".formatted(newUser));
-        jdbcTemplate.update(UPDATE_USER, newUser.getLogin(), newUser.getName(), newUser.getEmail(), newUser.getBirthday(), newUser.getId());
-
-        User updatedUser = getUser(newUser.getId());
-
-        if (updatedUser == null) {
-            throw new NotFoundException("Пользователь с id = %s не найден!".formatted(newUser.getId())); // Измените на NotFoundException
-        }
-
-        return updatedUser;
+        User user = getUser(newUser.getId());
+        jdbcTemplate.update(UPDATE_USER, newUser.getLogin(), newUser.getName(), newUser.getEmail(), newUser.getBirthday(), user.getId());
+        user.setName(newUser.getName());
+        user.setLogin(newUser.getLogin());
+        user.setBirthday(newUser.getBirthday());
+        user.setEmail(newUser.getEmail());
+        return  user;
     }
 
     @Override
     public List<User> getFriends(long userId) {
-        List<User> friends = jdbcTemplate.query(FIND_FRIENDS, (rs, rowNum) -> new User(
+       return jdbcTemplate.query(FIND_FRIENDS, (rs, rowNum) -> new User(
                 rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("email"),
                 rs.getString("login"),
                 rs.getObject("birthday", LocalDate.class)
         ), userId);
-
-        // Проверка, есть ли друзья
-        if (friends.isEmpty()) {
-            throw new IllegalArgumentException("У пользователя с ID " + userId + " нет друзей.");
-        }
-
-        return friends;
     }
 
-    public boolean isUserExistFriend(long userId, long friendId) {
-        Boolean exists = jdbcTemplate.queryForObject(IS_USER_EXISTS_FRIENDS, Boolean.class, userId, friendId);
-        return Boolean.TRUE.equals(exists);
+    public Integer isUserExistFriend(long userId, long friendId) {
+        Integer countOfFriends = jdbcTemplate.queryForObject(IS_USER_EXISTS_FRIENDS, Integer.class, userId, friendId);
+        return countOfFriends != null ? countOfFriends : 0;
     }
 
     public void isCorrectUser(Long userId) {
-        Boolean isExist = jdbcTemplate.queryForObject(IS_CORRECT_USER, Boolean.class, userId);
+        Integer isExist = jdbcTemplate.queryForObject(IS_CORRECT_USER, Integer.class, userId);
 
-        if (Boolean.FALSE.equals(isExist)) {
-            throw new IllegalArgumentException("Такого User не существует %s".formatted(userId));
+        if (isExist == null || isExist == 0) {
+            throw new NotFoundException("Такого User не существует %s".formatted(userId));
         }
     }
 
     @Override
     public boolean addFriend(long userId, long friendId) {
-        jdbcTemplate.update(ADD_FRIEND, userId, friendId);
-        return true;
+        int update = jdbcTemplate.update(ADD_FRIEND, userId, friendId);
+        return update > 0;
     }
 
     @Override
     public boolean removeFriend(long userId, long friendId) {
-        isUserExistFriend(userId, friendId);
         jdbcTemplate.update(REMOVE_FRIEND, userId, friendId);
+        jdbcTemplate.update(REMOVE_FRIEND, friendId, userId);
         return true;
     }
 
@@ -182,15 +174,6 @@ public class UserDbStorage implements UserStorage {
                 rs.getString("login"),
                 rs.getObject("birthday", LocalDate.class)
         ), user1, user2);
-    }
-
-    private Set<Long> getUserLikes(Long filmId) {
-        String sql = "SELECT user_id FROM user_likes WHERE movie_id = ?";
-        return new HashSet<>(jdbcTemplate.query(
-                sql,
-                (rs, rowNum) ->
-                        rs.getLong("user_id"), filmId)
-        );
     }
 }
 

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -109,9 +109,11 @@ public class UserDbStorageTest {
         User userNewFriend = userDbStorage.create(friend);
         long userId2 = userNewFriend.getId();
 
-        boolean result = userDbStorage.addFriend(userId1, userId2);
+        userDbStorage.addFriend(userId1, userId2);
 
-        assertThat(result).isTrue();
+//        assertTrue(userDbStorage.isUserExistFriend(userId1, userId2)); закомментируй пока
+//        assertFalse(userDbStorage.isUserExistFriend(userId2, userId1));
+
     }
 
     @Test

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,7 +12,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.*;
+
+
 
 @Slf4j
 @Repository
@@ -93,15 +97,24 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilm(long filmId) {
-        List<Film> films = jdbcTemplate.query(FIND_MOVIE_BY_ID, filmRowMapper, filmId);
-
-        // Проверяем, найден ли фильм
-        if (films.isEmpty()) {
-            return null; // Или выбросьте исключение, если хотите
+    public Optional<Film> getFilm(long filmId) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(
+                    "SELECT * FROM movies WHERE id = ?",
+                    (rs, rowNum) -> new Film(
+                            rs.getLong("id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getObject("releaseDate", LocalDate.class),
+                            rs.getInt("duration"),
+                            getUserLikes(filmId),
+                            List.of(getGenreFilm(rs.getInt("genre_id"))),
+                            getRatingFilm(rs.getInt("rating_id"))
+                            ), filmId
+            ));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
-
-        return films.getFirst();
     }
 
     @Override
@@ -137,7 +150,7 @@ public class FilmDbStorage implements FilmStorage {
                 newFilm.getId());
 
         if (updatedRows > 0) {
-            return getFilm(newFilm.getId());
+            return getFilm(newFilm.getId()).orElseThrow();
         } else {
             throw new IllegalArgumentException("Фильм с id %s не найден".formatted(newFilm.getId()));
         }
@@ -157,6 +170,15 @@ public class FilmDbStorage implements FilmStorage {
                         rs.getInt("id"),
                         rs.getString("genre_name")
                 ), genreId
+        );
+    }
+
+    private List<Long> getUserLikes(Long filmId) {
+        String sql = "SELECT user_id FROM user_likes WHERE movie_id = ?";
+        return new ArrayList<>(jdbcTemplate.query(
+                sql,
+                (rs, rowNum) ->
+                        rs.getLong("user_id"), filmId)
         );
     }
 }

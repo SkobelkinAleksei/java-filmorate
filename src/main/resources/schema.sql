@@ -33,12 +33,12 @@ CREATE TABLE IF NOT EXISTS friends (
 
 CREATE TABLE IF NOT EXISTS movie_genre (
     id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    genre_name VARCHAR(30) NOT NULL CHECK(genre_name IN ('COMEDY',
-                                                         'DRAMA',
-                                                         'CARTOON',
-                                                         'THRILLER',
-                                                         'DOCUMENTARY',
-                                                         'ACTION'))
+    genre_name VARCHAR(30) NOT NULL CHECK(genre_name IN ('Комедия',
+                                                         'Драма',
+                                                         'Мультфильм',
+                                                         'Триллер',
+                                                         'Документальный',
+                                                         'Боевик'))
 );
 
 CREATE TABLE IF NOT EXISTS movie_rating (

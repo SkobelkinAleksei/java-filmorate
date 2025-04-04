@@ -25,6 +25,7 @@ public class FilmController {
 
     // Получение фильма
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Film getFilm(@PathVariable long id) throws NotFoundException {
         return filmService.getFilm(id);
     }

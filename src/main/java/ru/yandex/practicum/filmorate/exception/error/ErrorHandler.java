@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessageResponse handleException(MethodArgumentNotValidException ex) {
         return new ErrorMessageResponse(constructMethodArgumentNotValidMessage(ex), LocalDateTime.now().toString());
+    }
+
+    @ExceptionHandler(value = AlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse exceptionError(AlreadyExistsException e) {
+       return new ErrorResponse(e.getMessage());
     }
 
     private static String constructMethodArgumentNotValidMessage(
