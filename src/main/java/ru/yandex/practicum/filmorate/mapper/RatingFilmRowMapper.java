@@ -14,7 +14,7 @@ public class RatingFilmRowMapper implements RowMapper<RatingFilm> {
     public RatingFilm mapRow(ResultSet rs, int rowNum) throws SQLException {
         RatingFilm ratingFilm = new RatingFilm();
         ratingFilm.setId(rs.getInt("id"));
-        ratingFilm.setName(rs.getString("name"));
+        ratingFilm.setName(rs.getString("rating"));
 
         return ratingFilm;
     }

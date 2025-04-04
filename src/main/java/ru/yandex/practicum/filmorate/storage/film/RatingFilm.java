@@ -1,13 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class RatingFilm {
-    private int id;
+    private long id;
     private String name;
 }

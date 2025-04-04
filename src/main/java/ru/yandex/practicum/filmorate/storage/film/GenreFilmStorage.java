@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.List;
 
 public interface GenreFilmStorage {
-    Collection<GenreFilm> getAll();
+    List<GenreFilm> getAll();
 
-    String getGenre(Integer id);
+    GenreFilm getById(long id);
 
-    List<GenreFilm> getGenresOfFilm(Long filmId);
+    List<GenreFilm> getGenresOfFilm(long id);
 }

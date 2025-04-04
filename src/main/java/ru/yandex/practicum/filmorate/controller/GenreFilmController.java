@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -19,14 +20,12 @@ public class GenreFilmController {
     private final GenreService genreService;
 
     @GetMapping
-    public Collection<GenreFilm> getAll() {
-        log.debug("Список всех жанров");
+    public List<GenreFilm> getAll() {
         return genreService.getAll();
     }
 
     @GetMapping("/{id}")
-    public String get(@PathVariable Integer id) {
-        log.debug("Название жанра с ID = {}", id);
-        return genreService.getGenre(id);
+    public GenreFilm getById(@PathVariable Long id) {
+        return genreService.getById(id);
     }
 }

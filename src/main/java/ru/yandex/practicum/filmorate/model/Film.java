@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
 import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -28,14 +30,13 @@ public class Film {
     @NotNull(message = "Продолжительность фильма не может быть пуста или null")
     private int duration;
 
-    private Set<Long> userLikes;
-
-    private GenreFilm genre;
+    private List<Long> userLikes;
+    private List<GenreFilm> genre;
 
     private RatingFilm rating;
 
     public Film(Long id, String name, String description,
-                LocalDate releaseDate, int duration, Set<Long> userLikes, GenreFilm genre, RatingFilm rating) {
+                LocalDate releaseDate, int duration, List<Long> userLikes, List<GenreFilm> genre, RatingFilm rating) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.service.RatingService;
 import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
 
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -19,14 +19,12 @@ public class RatingFilmController {
     private final RatingService ratingService;
 
     @GetMapping
-    public Collection<RatingFilm> getAll() {
-        log.debug("Запрашиваем список возрастных ограничений");
+    public List<RatingFilm> getAll() {
         return ratingService.getAll();
     }
 
     @GetMapping("/{id}")
-    public String getRating(@PathVariable Integer id) {
-        log.debug("Запрос названия рейтинга с ID = {}", id);
-        return ratingService.getRating(id);
+    public RatingFilm getById(@PathVariable long id) {
+        return ratingService.getById(id);
     }
 }
