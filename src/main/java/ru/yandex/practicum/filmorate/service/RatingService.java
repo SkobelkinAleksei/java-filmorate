@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.storage.film.RatingFilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
-import ru.yandex.practicum.filmorate.storage.film.RatingFilmStorage;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service

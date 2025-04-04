@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.storage.film.GenreFilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
-import ru.yandex.practicum.filmorate.storage.film.GenreFilmStorage;
 
-import java.util.Collection;
 import java.util.List;
 
 @AllArgsConstructor

@@ -16,7 +16,6 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.*;
 
-
 @Slf4j
 @Repository
 @Qualifier("userDbStorage")

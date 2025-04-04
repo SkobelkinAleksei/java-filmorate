@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
 
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j

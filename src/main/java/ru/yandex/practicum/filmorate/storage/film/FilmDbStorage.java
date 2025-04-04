@@ -104,7 +104,6 @@ public class FilmDbStorage implements FilmStorage {
         return films.getFirst();
     }
 
-
     @Override
     public Film createFilm(Film film) {
         log.info("Film info before creating: {}", film);
