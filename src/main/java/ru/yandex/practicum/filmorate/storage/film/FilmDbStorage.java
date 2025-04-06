@@ -132,7 +132,6 @@ public class FilmDbStorage implements FilmStorage {
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("releaseDate").toLocalDate());
             film.setDuration(rs.getInt("duration"));
-            new ArrayList<>();
             film.setMpa(new Mpa(rs.getLong("movie_rating.id"), rs.getString("movie_rating.mpa")));
             return film;
         }
@@ -219,13 +218,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film newFilm) {
-        int updatedRows = jdbcTemplate.update(UPDATE_MOVIE,
-                newFilm.getName(),
-                newFilm.getDescription(),
-                newFilm.getReleaseDate(),
-                newFilm.getDuration(),
-                newFilm.getId()
-        );
+        int updatedRows = jdbcTemplate.update(UPDATE_MOVIE, new FilmMapper());
 
         if (updatedRows > 0) {
             return newFilm;
