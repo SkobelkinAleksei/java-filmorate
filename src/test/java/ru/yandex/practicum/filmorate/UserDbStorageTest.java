@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,11 +63,11 @@ public class UserDbStorageTest {
 
     @Test
     void testGetUserByIdNotFound() {
-        User userId = null;
         try {
-            userId = userDbStorage.getUser(999L);
-        } catch (NoSuchElementException e) {
-            assertThat(userId).isNull();
+            userDbStorage.getUser(999L);
+            fail("Expected NotFoundException to be thrown");
+        } catch (NotFoundException e) {
+            assertThat(e.getMessage()).isEqualTo("Юзер с тайм id не найден");
         }
     }
 
