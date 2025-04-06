@@ -82,23 +82,24 @@ public class FilmDbStorage implements FilmStorage {
 
     private static final String FIND_TOP_MOVIES = """
              SELECT f.id,
-                     f.name,
-                     f.description,
-                     f.releaseDate,
-                     f.duration,
-                     GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
-                     GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
-                     r.id AS rating_id,
-                     r.mpa AS rating_name,
-                     COUNT(l.user_id) AS like_count,
-                     GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
-              FROM movies AS f
-                       LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
-                       LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
-                       LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
-                       LEFT JOIN user_likes AS l ON f.id = l.movie_id
-              GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa
-              HAVING COUNT(l.user_id) > 1
+                    f.name,
+                    f.description,
+                    f.releaseDate,
+                    f.duration,
+                    GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
+                    GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
+                    r.id AS rating_id,
+                    r.mpa AS rating_name,
+                    COUNT(l.user_id) AS like_count,
+                    GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
+             FROM movies AS f
+                      LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
+                      LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
+                      LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
+                      LEFT JOIN user_likes AS l ON f.id = l.movie_id
+             GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa
+             HAVING COUNT(l.user_id) > 0
+             ORDER BY like_count DESC;
             """;
     private static final String ADD_LIKE = "INSERT INTO user_likes (user_id, movie_id) VALUES (?, ?)";
     private static final String REMOVE_LIKE = "DELETE FROM user_likes WHERE user_id = ? AND movie_id = ?";
@@ -158,6 +159,7 @@ public class FilmDbStorage implements FilmStorage {
         return Arrays.stream(genreIds.split(","))
                 .map(Long::parseLong)
                 .map(genreFilmDbStorage::getById)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
@@ -175,7 +177,6 @@ public class FilmDbStorage implements FilmStorage {
                     new Mpa(rs.getLong("rating_id"), rs.getString("rating_name"))
             );
         },filmId).stream().findFirst();
-
     }
 
     @Override

@@ -56,7 +56,7 @@ public class FilmController {
         filmService.removeLike(filmId, userId);
     }
 
-    // Возвращает список из первых 10-и
+    // Возвращает список из первых 5-и
     @GetMapping("/popular")
     public Collection<Film> getTopMovies() throws NotFoundException {
         return filmService.getTopMovies();
