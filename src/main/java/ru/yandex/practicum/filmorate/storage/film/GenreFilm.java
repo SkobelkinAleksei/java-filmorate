@@ -16,7 +16,7 @@ public class GenreFilm {
     @NotNull
     private String name;
 
-    public GenreFilm(Long id){
+    public GenreFilm(Long id) {
         this.id = id;
     }
 }
