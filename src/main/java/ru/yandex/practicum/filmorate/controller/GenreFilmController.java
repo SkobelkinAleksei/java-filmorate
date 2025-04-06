@@ -30,9 +30,7 @@ public class GenreFilmController {
     }
 
     @GetMapping("/films/{id}")
-    public List<Film> getFilmByGenre(
-            @PathVariable("id") Long id
-    ){
+    public List<Film> getFilmByGenre(@PathVariable("id") Long id) {
         return genreService.getFilmsByGenreId(id);
     }
 }
