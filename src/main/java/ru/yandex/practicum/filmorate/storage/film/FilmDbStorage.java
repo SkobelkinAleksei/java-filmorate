@@ -4,17 +4,16 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 @Repository
@@ -23,22 +22,9 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreFilmDbStorage genreFilmDbStorage;
 
     private static final String FIND_ALL_MOVIES = """
-            SELECT f.id,
-                   f.name,
-                   f.description,
-                   f.releaseDate,
-                   f.duration,
-                   GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
-                   GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
-                   r.id AS rating_id,
-                   r.mpa AS rating_name,
-                   GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
-            FROM movies AS f
-                     LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
-                     LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
-                     LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
-                     LEFT JOIN user_likes AS l ON f.id = l.movie_id
-            GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa
+            SELECT f.*, m.id AS mpa_id, m.mpa
+            FROM movies f
+            LEFT JOIN movie_rating AS m ON f.mpa_id = m.id;
             """;
     private static final String FIND_MOVIE_BY_ID = """
              SELECT f.id,
@@ -112,7 +98,34 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findAll() {
-        return jdbcTemplate.query(FIND_ALL_MOVIES, (rs, rowNum) -> {
+        List<Film> films = jdbcTemplate.query(FIND_ALL_MOVIES, new FilmMapper());
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            film.setUserLikes(getLikesByFilmId(film.getId()));
+        }
+        return films;
+    }
+
+    private List<Long> getLikesByFilmId(Long filmId) {
+        String sql = "SELECT user_id FROM user_likes WHERE movie_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), filmId);
+    }
+
+    private Set<GenreFilm> getGenresByFilmId(Long filmId) {
+        String sql = """
+        SELECT g.genre_id, g.genre_type
+        FROM genre g
+        JOIN movie_genre mg ON g.genre_id = mg.genre_id
+        WHERE mg.movie_id = ?
+        ORDER BY g.genre_id ASC;
+        """;
+        return new LinkedHashSet<>(jdbcTemplate.query(sql, (rs, rowNum) ->
+                new GenreFilm(rs.getLong("genre_id"), rs.getString("genre_type")), filmId));
+    }
+
+    public class FilmMapper implements RowMapper<Film> {
+        @Override
+        public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
             Film film = new Film();
             film.setId(rs.getLong("id"));
             film.setName(rs.getString("name"));
@@ -121,9 +134,8 @@ public class FilmDbStorage implements FilmStorage {
             film.setDuration(rs.getInt("duration"));
             new ArrayList<>();
             film.setMpa(new Mpa(rs.getLong("movie_rating.id"), rs.getString("movie_rating.mpa")));
-            parseGenres(rs.getString("genre_ids"));
             return film;
-        });
+        }
     }
 
     @Override
@@ -138,17 +150,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getTopMovies() {
-        return jdbcTemplate.query(FIND_TOP_MOVIES, (rs, rowNum) -> {
-            Film film = new Film();
-            film.setId(rs.getLong("id"));
-            film.setName(rs.getString("name"));
-            film.setDescription(rs.getString("description"));
-            film.setReleaseDate(rs.getDate("releaseDate").toLocalDate());
-            film.setDuration(rs.getInt("duration"));
-            film.setMpa(new Mpa(rs.getLong("movie_rating.id"), rs.getString("movie_rating.mpa")));
-            parseGenres(rs.getString("genre_ids"));
-            return film;
-        });
+        return jdbcTemplate.query(FIND_TOP_MOVIES,new FilmMapper());
     }
 
     private Set<GenreFilm> parseGenres(String genreIds) {
