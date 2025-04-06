@@ -22,6 +22,7 @@ public class GenreService {
 
     public GenreFilm getById(Long id) {
         GenreFilm genreId = genreFilmStorage.getById(id);
+
         if (genreId == null) {
             throw new NotFoundException("Жанра с таким id = " + id + " нет");
         } else {
@@ -29,7 +30,7 @@ public class GenreService {
         }
     }
 
-    public List<Film> getFilmsByGenreId(Long id){
+    public List<Film> getFilmsByGenreId(Long id) {
         return genreFilmStorage.getGenresOfFilm(id);
     }
 }

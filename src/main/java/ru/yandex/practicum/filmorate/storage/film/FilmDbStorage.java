@@ -150,11 +150,11 @@ public class FilmDbStorage implements FilmStorage {
         });
     }
 
-
     private Set<GenreFilm> parseGenres(String genreIds) {
         if (genreIds == null || genreIds.isEmpty()) {
             return Set.of();
         }
+
         return Arrays.stream(genreIds.split(","))
                 .map(Long::parseLong)
                 .map(genreFilmDbStorage::getById)

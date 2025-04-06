@@ -6,13 +6,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-
 import java.util.List;
 
 @Slf4j
 @Repository
 public class RatingFilmDbStorage implements RatingFilmStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
     private static final String GET_ALL_RATING = """
@@ -31,14 +29,6 @@ public class RatingFilmDbStorage implements RatingFilmStorage {
             FROM movie_rating
             WHERE mpa = ?
             LIMIT 1
-            """;
-
-    private static final String GET_RATING_OF_FILM = """
-            SELECT *
-            FROM movie_rating
-            WHERE id IN (SELECT mpa
-                         FROM movies
-                         WHERE id = ?)
             """;
 
     @Autowired
@@ -81,12 +71,4 @@ public class RatingFilmDbStorage implements RatingFilmStorage {
         }
 
     }
-
-    @Override
-    public Mpa getRatingOfFilm(Long id) {
-//        return jdbcTemplate.queryForObject(GET_RATING_OF_FILM, id);
-        return null;
-    }
-
-
 }
