@@ -4,10 +4,10 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.*;
@@ -62,33 +62,40 @@ public class FilmDbStorage implements FilmStorage {
             SET m.name = ?,
                 m.description = ?,
                 m.releaseDate = ?,
-                m.duration = ?
+                m.duration = ?,
+                m.mpa_id = ?
             WHERE m.id = ?
             """;
 
     private static final String FIND_TOP_MOVIES = """
-             SELECT f.id,
-                    f.name,
-                    f.description,
-                    f.releaseDate,
-                    f.duration,
-                    GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
-                    GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
-                    r.id AS rating_id,
-                    r.mpa AS rating_name,
-                    COUNT(l.user_id) AS like_count,
-                    GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
-             FROM movies AS f
-                      LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
-                      LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
-                      LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
-                      LEFT JOIN user_likes AS l ON f.id = l.movie_id
-             GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa
-             HAVING COUNT(l.user_id) > 0
-             ORDER BY like_count DESC;
-            """;
-    private static final String ADD_LIKE = "INSERT INTO user_likes (user_id, movie_id) VALUES (?, ?)";
-    private static final String REMOVE_LIKE = "DELETE FROM user_likes WHERE user_id = ? AND movie_id = ?";
+    SELECT f.id,
+           f.name,
+           f.description,
+           f.releaseDate,
+           f.duration,
+           GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
+           GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
+           r.id AS rating_id,
+           r.mpa AS rating_name,
+           COUNT(l.user_id) AS like_count,
+           GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
+    FROM movies AS f
+    LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
+    LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
+    LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
+    LEFT JOIN user_likes AS l ON f.id = l.movie_id
+    GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa
+    HAVING COUNT(l.user_id) > 0
+    ORDER BY like_count DESC;
+    """;
+    private static final String ADD_LIKE = """
+                      INSERT INTO user_likes (user_id, movie_id)
+                      VALUES (?, ?)
+                      """;
+    private static final String REMOVE_LIKE = """
+                    DELETE FROM user_likes
+                    WHERE user_id = ? AND movie_id = ?
+                    """;
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, GenreFilmDbStorage genreFilmDbStorage) {
@@ -123,20 +130,6 @@ public class FilmDbStorage implements FilmStorage {
                 new GenreFilm(rs.getLong("genre_id"), rs.getString("genre_type")), filmId));
     }
 
-    public class FilmMapper implements RowMapper<Film> {
-        @Override
-        public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Film film = new Film();
-            film.setId(rs.getLong("id"));
-            film.setName(rs.getString("name"));
-            film.setDescription(rs.getString("description"));
-            film.setReleaseDate(rs.getDate("releaseDate").toLocalDate());
-            film.setDuration(rs.getInt("duration"));
-            film.setMpa(new Mpa(rs.getLong("movie_rating.id"), rs.getString("movie_rating.mpa")));
-            return film;
-        }
-    }
-
     @Override
     public void addLike(Long filmId, Long userId) {
         jdbcTemplate.update(ADD_LIKE, userId, filmId);
@@ -150,18 +143,6 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getTopMovies() {
         return jdbcTemplate.query(FIND_TOP_MOVIES,new FilmMapper());
-    }
-
-    private Set<GenreFilm> parseGenres(String genreIds) {
-        if (genreIds == null || genreIds.isEmpty()) {
-            return Set.of();
-        }
-
-        return Arrays.stream(genreIds.split(","))
-                .map(Long::parseLong)
-                .map(genreFilmDbStorage::getById)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
     }
 
     @Override
@@ -182,6 +163,14 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) throws ValidationException {
+        // Проверка на уникальность имени
+        String sqlCheckName = "SELECT COUNT(*) FROM movies WHERE name = ?";
+        Integer count = jdbcTemplate.queryForObject(sqlCheckName, Integer.class, film.getName());
+
+        if (count != null && count > 0) {
+            throw new ValidationException("Film with the name '" + film.getName() + "' already exists.");
+        }
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(INSERT_MOVIE, Statement.RETURN_GENERATED_KEYS);
@@ -194,37 +183,42 @@ public class FilmDbStorage implements FilmStorage {
         }, keyHolder);
         film.setId(keyHolder.getKey().longValue());
 
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            addGenres(film.getId(), film.getGenres());
-        }
+        saveGenres(film);
 
         return film;
     }
 
-    private void addGenres(Long filmId, Set<GenreFilm> genres) {
-        log.debug("addGenres({}, {})", filmId, genres);
+    @Override
+    public Film update(Film newFilm) {
+        jdbcTemplate.update(UPDATE_MOVIE, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
+        jdbcTemplate.update("DELETE FROM movie_genre WHERE movie_id = ?", newFilm.getId());
+        saveGenres(newFilm);
+        return newFilm;
+    }
 
-        Set<GenreFilm> uniqueGenres = new HashSet<>();
+    private void saveGenres(Film film) {
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            String sql = "INSERT INTO movie_genre (movie_id, genre_id) VALUES (?, ?)";
+            Set<Long> seen = new HashSet<>();
 
-        for (GenreFilm genre : genres) {
-            if (uniqueGenres.add(genre)) {
-                jdbcTemplate.update("INSERT INTO movie_genre (movie_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
-                log.trace("Genre {} was added to movie {}", genre.getName(), filmId);
-            } else {
-                log.trace("Duplicate genre {} found in input and will not be added", genre.getName());
+            for (GenreFilm genre : film.getGenres()) {
+                if (seen.add(genre.getId())) {
+                    jdbcTemplate.update(sql, film.getId(), genre.getId());
+                }
             }
         }
     }
 
-    @Override
-    public Film update(Film newFilm) {
-        int updatedRows = jdbcTemplate.update(UPDATE_MOVIE, new FilmMapper());
-
-        if (updatedRows > 0) {
-            return newFilm;
-        } else {
-            throw new IllegalArgumentException("Фильм с id %s не найден".formatted(newFilm.getId()));
+    private Set<GenreFilm> parseGenres(String genreIds) {
+        if (genreIds == null || genreIds.isEmpty()) {
+            return Set.of();
         }
+
+        return Arrays.stream(genreIds.split(","))
+                .map(Long::parseLong)
+                .map(genreFilmDbStorage::getById)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 }
 

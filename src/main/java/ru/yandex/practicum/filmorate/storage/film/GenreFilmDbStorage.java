@@ -124,6 +124,4 @@ public class GenreFilmDbStorage implements GenreFilmStorage {
 
         return true;
     }
-
-
 }

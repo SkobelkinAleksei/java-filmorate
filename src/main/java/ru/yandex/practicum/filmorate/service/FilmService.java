@@ -85,7 +85,7 @@ public class FilmService {
     }
 
     public Film update(Film newFilm) {
-        if (newFilm.getId() == null) {
+        if (getFilm(newFilm.getId()) == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
         }
         log.info("Обновление фильма: {}", newFilm);
