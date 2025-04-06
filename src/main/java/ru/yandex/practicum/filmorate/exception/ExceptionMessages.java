@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.exception;
 
 public class ExceptionMessages {
-
     //ValidationException пользователь
     public static final String EMAIL_CANNOT_BE_EMPTY = "Почта не может быть пустой и должна содержать символ @";
     public static final String LOGIN_CANNOT_BE_EMPTY = "Логин не может быть пуст и не должен содержать пробелы";
@@ -17,6 +16,4 @@ public class ExceptionMessages {
     public static final String FILM_NOT_A_GENRE = "Фильм должен иметь хотя бы один жанр";
     public static final String FILM_NOT_A_RATING = "Фильм должен иметь рейтинг";
 
-    //текс для DuplicatedDataException
-    public static final String EMAIL_ALREADY_EXISTS = "Этот емейл уже используется";
 }

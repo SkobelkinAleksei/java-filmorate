@@ -10,13 +10,13 @@ public interface FilmStorage {
 
     Collection<Film> findAll();
 
-    boolean addLike(long filmId, long userId);
+    void addLike(Long filmId, Long userId);
 
-    boolean removeLike(long filmId, long userId);
+    void removeLike(Long filmId, Long userId);
 
     Collection<Film> getTopMovies();
 
-    Optional<Film> getFilm(long filmId);
+    Optional<Film> getFilm(Long filmId);
 
     Film createFilm(Film film) throws ValidationException;
 

@@ -4,9 +4,10 @@ import java.util.List;
 
 public interface RatingFilmStorage {
 
-    List<RatingFilm> getAll();
+    List<Mpa> getAll();
 
-    RatingFilm getById(long id);
+    Mpa getById(Long id);
+    Mpa getByName(String name);
 
-    RatingFilm getRatingOfFilm(Long id);
+    Mpa getRatingOfFilm(Long id);
 }

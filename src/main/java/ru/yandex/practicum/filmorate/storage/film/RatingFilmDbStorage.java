@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.mapper.RatingFilmRowMapper;
+
 
 import java.util.List;
 
@@ -14,7 +14,6 @@ import java.util.List;
 public class RatingFilmDbStorage implements RatingFilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final RatingFilmRowMapper ratingFilmRowMapper;
 
     private static final String GET_ALL_RATING = """
                 SELECT *
@@ -27,36 +26,67 @@ public class RatingFilmDbStorage implements RatingFilmStorage {
             WHERE id = ?
             """;
 
+    private static final String GET_BY_NAME_RATING = """
+            SELECT *
+            FROM movie_rating
+            WHERE mpa = ?
+            LIMIT 1
+            """;
+
     private static final String GET_RATING_OF_FILM = """
             SELECT *
             FROM movie_rating
-            WHERE id IN (SELECT rating_id
+            WHERE id IN (SELECT mpa
                          FROM movies
                          WHERE id = ?)
             """;
 
     @Autowired
-    public RatingFilmDbStorage(JdbcTemplate jdbcTemplate, RatingFilmRowMapper ratingFilmRowMapper) {
+    public RatingFilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.ratingFilmRowMapper = ratingFilmRowMapper;
     }
 
     @Override
-    public List<RatingFilm> getAll() {
-        return jdbcTemplate.query(GET_ALL_RATING, ratingFilmRowMapper);
+    public List<Mpa> getAll() {
+        return jdbcTemplate.query(GET_ALL_RATING,  (rs, rowNum) ->
+                new Mpa(
+                        rs.getLong("id"),
+                        rs.getString("mpa")
+                ));
     }
 
-    public RatingFilm getById(long id) {
+
+    @Override
+    public Mpa getByName(String name) {
         try {
-            return jdbcTemplate.queryForObject(GET_BY_ID_RATING, ratingFilmRowMapper, id);
+            return jdbcTemplate.queryForObject(GET_BY_NAME_RATING, (rs, rowNum) ->
+                    new Mpa(
+                            rs.getLong("id"),
+                            rs.getString("mpa")
+                    ), name);
         } catch (EmptyResultDataAccessException e) {
-            return null; // Возвращаем null, если рейтинг не найден
+            return null;
         }
     }
 
-    @Override
-    public RatingFilm getRatingOfFilm(Long id) {
-        return jdbcTemplate.queryForObject(GET_RATING_OF_FILM, ratingFilmRowMapper, id);
+    public Mpa getById(Long id) {
+        try {
+            return jdbcTemplate.queryForObject(GET_BY_ID_RATING, (rs, rowNum) ->
+                    new Mpa(
+                            rs.getLong("id"),
+                            rs.getString("mpa")
+                    ), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+
     }
+
+    @Override
+    public Mpa getRatingOfFilm(Long id) {
+//        return jdbcTemplate.queryForObject(GET_RATING_OF_FILM, id);
+        return null;
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenreFilm {
-    private long id;
+    @NotNull
+    private Long id;
+    @NotNull
     private String name;
+
+    public GenreFilm(Long id){
+        this.id = id;
+    }
 }

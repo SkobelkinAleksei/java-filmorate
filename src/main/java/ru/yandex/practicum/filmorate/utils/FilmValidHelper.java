@@ -34,10 +34,10 @@ public class FilmValidHelper implements FilmValidMethods {
         if (film.getDuration() <= 0) {
             logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_LENGTH_IS_NEGATIVE));
         }
-        if (film.getGenre() == null) {
+        if (film.getGenres() == null) {
             logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_NOT_A_GENRE));
         }
-        if (film.getRating() == null) {
+        if (film.getMpa() == null) {
             logHelper.logAndThrow(new ValidationException(ExceptionMessages.FILM_NOT_A_RATING));
         }
     }

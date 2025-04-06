@@ -6,16 +6,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import ru.yandex.practicum.filmorate.storage.user.StatusFriend;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 @Getter
@@ -40,23 +37,6 @@ public class User {
 
     private List<Long> friendIds;
 
-    public User() {}
 
-    public User(Long id, String login, String name, String email, LocalDate birthday) {
-        this.id = id;
-        this.login = login;
-        this.name = name;
-        this.email = email;
-        this.birthday = birthday;
-    }
-
-    public User(Long id, String name, String email, String login, LocalDate birthday, List<Long> friendIds) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.login = login;
-        this.birthday = birthday;
-        this.friendIds = friendIds;
-    }
 
 }

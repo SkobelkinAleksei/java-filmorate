@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-
+import ru.yandex.practicum.filmorate.storage.film.*;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.util.Collections;
@@ -19,7 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmDbStorage filmDbStorage;
+    private final RatingFilmDbStorage ratingFilmDbStorage;
     private final UserDbStorage userDbStorage;
+    private final GenreFilmDbStorage genreFilmDbStorage;
 
     public List<Film> findAll() {
         List<Film> films = filmDbStorage.findAll();
@@ -31,7 +32,7 @@ public class FilmService {
         return films;
     }
 
-    public boolean addLike(Long filmId, Long userId) {
+    public void addLike(Long filmId, Long userId) {
         log.info("Добавление лайка: фильм с id {} от пользователя с id {}", filmId, userId);
 
         User user = userDbStorage.getUser(userId);
@@ -39,10 +40,10 @@ public class FilmService {
             throw new EntityNotFoundException("User with id %s not found!".formatted(userId));
         }
 
-        return filmDbStorage.addLike(filmId, user.getId());
+        filmDbStorage.addLike(filmId, user.getId());
     }
 
-    public boolean removeLike(Long filmId, Long userId) {
+    public void removeLike(Long filmId, Long userId) {
         log.info("Удаление лайка: фильм с id {} от пользователя с id {}", filmId, userId);
 
         User user = userDbStorage.getUser(userId);
@@ -50,11 +51,7 @@ public class FilmService {
             throw new EntityNotFoundException("User with id %s not found!".formatted(userId));
         }
 
-        Film film = filmDbStorage.getFilm(filmId).orElseThrow(
-                () -> new NotFoundException("Фильм не найден! %s".formatted(filmId))
-        );
-
-        return filmDbStorage.removeLike(film.getId(), user.getId());
+        filmDbStorage.removeLike(filmId, userId);
     }
 
     public List<Film> getTopMovies() {
@@ -76,13 +73,14 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            throw new IllegalArgumentException("Название фильма не может быть пустым");
+        if (ratingFilmDbStorage.getById(film.getMpa().getId()) == null) {
+            throw new NotFoundException("Рейтинг фильма не найден %s".formatted(film.getMpa()));
         }
-        if (film.getDuration() <= 0) {
-            throw new IllegalArgumentException("Продолжительность фильма должна быть положительной");
+
+        if (film.getGenres() != null) {
+            genreFilmDbStorage.checkGenres(film.getGenres());
         }
-        log.info("Создание фильма: {}", film);
+
         return filmDbStorage.createFilm(film);
     }
 
@@ -90,14 +88,9 @@ public class FilmService {
         if (newFilm.getId() == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
         }
-
         log.info("Обновление фильма: {}", newFilm);
 
-        Film updatedFilm = filmDbStorage.update(newFilm); // Предполагаем, что этот метод теперь возвращает Film или null
-        if (updatedFilm == null) {
-            throw new IllegalArgumentException("Фильм с id %s не найден".formatted(newFilm.getId()));
-        }
-
-        return updatedFilm;
+        return filmDbStorage.update(newFilm);
     }
 }
+

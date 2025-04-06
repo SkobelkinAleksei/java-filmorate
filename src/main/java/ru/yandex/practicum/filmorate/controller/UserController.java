@@ -21,13 +21,13 @@ public class UserController {
 
     // Получение всех Пользователей.
     @GetMapping
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         return userService.findAll();
     }
 
     // Получение User
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable long id) throws NotFoundException {
+    public User getUserById(@PathVariable Long id) throws NotFoundException {
         return userService.getUser(id);
     }
 
@@ -47,20 +47,19 @@ public class UserController {
     // Добавление в друзья
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{userId}/friends/{friendId}")
-    public boolean addFriend(@PathVariable long userId, @PathVariable long friendId) throws NotFoundException {
-        return userService.addFriend(userId, friendId);
+    public void addFriend(@PathVariable Long userId, @PathVariable long friendId) throws NotFoundException {
+        userService.addFriend(userId, friendId);
     }
 
     // Удаление из друзей
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public boolean removeFriend(@PathVariable long userId, @PathVariable long friendId) {
-        return userService.removeFriend(userId, friendId);
+    public void removeFriend(@PathVariable Long userId, @PathVariable long friendId) {
+        userService.removeFriend(userId, friendId);
     }
-
     // Возвращаем друзей User
     @GetMapping("/{userId}/friends")
-    public List<User> getFriends(@PathVariable long userId) throws NotFoundException {
+    public List<User> getFriends(@PathVariable Long userId) throws NotFoundException {
         return userService.getFriends(userId);
     }
 

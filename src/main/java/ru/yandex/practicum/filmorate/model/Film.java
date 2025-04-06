@@ -1,16 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
-import ru.yandex.practicum.filmorate.storage.film.RatingFilm;
+import ru.yandex.practicum.filmorate.storage.film.Mpa;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Builder
 @Data
 public class Film {
@@ -23,25 +27,21 @@ public class Film {
     private String description;
 
     @NotNull(message = "Дата релиза фильма не может быть пуста или null")
+    @Past
     private LocalDate releaseDate;
 
+
+    @AssertTrue(message = "Дата должна быть после 28 декабря 1895")
+    public boolean isValidDate(){
+        LocalDate minDate = LocalDate.of(1895, 12, 28);
+        return releaseDate != null && releaseDate.isAfter(minDate);
+    }
+
     @NotNull(message = "Продолжительность фильма не может быть пуста или null")
-    private int duration;
+    @Min(1)
+    private Integer duration;
 
     private List<Long> userLikes;
-    private List<GenreFilm> genre;
-
-    private RatingFilm rating;
-
-    public Film(Long id, String name, String description,
-                LocalDate releaseDate, int duration, List<Long> userLikes, List<GenreFilm> genre, RatingFilm rating) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.userLikes = userLikes;
-        this.genre = genre;
-        this.rating = rating;
-    }
+    private Set<GenreFilm> genres;
+    private Mpa mpa;
 }

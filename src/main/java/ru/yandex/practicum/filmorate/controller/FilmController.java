@@ -45,15 +45,15 @@ public class FilmController {
 
     // Ставим лайк фильму
     @PutMapping("/{filmId}/like/{userId}")
-    public boolean addLike(@PathVariable long filmId, @PathVariable long userId) throws NotFoundException {
-        return filmService.addLike(filmId, userId);
+    public void addLike(@PathVariable long filmId, @PathVariable Long userId) throws NotFoundException {
+        filmService.addLike(filmId, userId);
     }
 
     //  пользователь удаляет лайк
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{filmId}/like/{userId}")
-    public boolean removeLike(@PathVariable long filmId, @PathVariable long userId) {
-        return filmService.removeLike(filmId, userId);
+    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        filmService.removeLike(filmId, userId);
     }
 
     // Возвращает список из первых 10-и
