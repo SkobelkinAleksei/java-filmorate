@@ -31,7 +31,7 @@ public class Film {
 
 
     @AssertTrue(message = "Дата должна быть после 28 декабря 1895")
-    public boolean isValidDate(){
+    public boolean isValidDate() {
         LocalDate minDate = LocalDate.of(1895, 12, 28);
         return releaseDate != null && releaseDate.isAfter(minDate);
     }
