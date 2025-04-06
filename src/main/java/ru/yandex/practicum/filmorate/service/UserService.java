@@ -42,14 +42,10 @@ public class UserService {
     }
 
     public User update(User newUser) {
-        if (newUser.getId() == null) {
-            throw new ValidationException("id не может быть NULL");
+        User existingUser = userDbStorage.getUser(newUser.getId());
+        if (existingUser == null) {
+            throw new NotFoundException("Пользователь с id %s не был найден.".formatted(newUser.getId()));
         }
-
-        if (userDbStorage.getUser(newUser.getId()) == null) {
-            throw new NotFoundException("Пользователь с id %s не был найден ".formatted(newUser.getId()));
-        }
-
         return userDbStorage.update(newUser);
     }
 

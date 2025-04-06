@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -113,6 +114,10 @@ public class UserDbStorage implements UserStorage {
                         getFriendsId(rs.getLong("id"))
                 ), userId);
 
+        if (query.isEmpty()) {
+            throw new NotFoundException("Юзер с тайм id не найден");
+        }
+
         return query.getFirst();
     }
 
@@ -134,7 +139,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User newUser) {
-        jdbcTemplate.update(UPDATE_USER,
+        int update = jdbcTemplate.update(UPDATE_USER,
                 newUser.getName(),
                 newUser.getEmail(),
                 newUser.getLogin(),
