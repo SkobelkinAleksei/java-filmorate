@@ -21,7 +21,7 @@ public class GenreFilmDbStorage implements GenreFilmStorage {
     private static final String GET_ALL_GENRE = """
             SELECT g.genre_id, g.genre_type
             FROM genre g
-            ORDER BY g.genre_id     
+            ORDER BY g.genre_id
             """;
     private static final String GET_BY_ID_GENRE = """
             SELECT g.genre_id, g.genre_type

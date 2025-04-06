@@ -51,14 +51,14 @@ public class FilmDbStorage implements FilmStorage {
                    r.id AS rating_id,
                    r.mpa AS rating_name,
                    mg.movie_id, mg.genre_id,
-                   g.genre_id, g.genre_type, 
+                   g.genre_id, g.genre_type,
                    GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
             FROM movies AS f
                      LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
                      LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
                      LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
-                     LEFT JOIN user_likes AS l ON f.id = l.movie_id 
-            WHERE f.id = ?         
+                     LEFT JOIN user_likes AS l ON f.id = l.movie_id
+            WHERE f.id = ?
             GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa;
             """;
 
