@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -57,6 +56,7 @@ public class UserController {
     public void removeFriend(@PathVariable Long userId, @PathVariable long friendId) {
         userService.removeFriend(userId, friendId);
     }
+
     // Возвращаем друзей User
     @GetMapping("/{userId}/friends")
     public List<User> getFriends(@PathVariable Long userId) throws NotFoundException {
