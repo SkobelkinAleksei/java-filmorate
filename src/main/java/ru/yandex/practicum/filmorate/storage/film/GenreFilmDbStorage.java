@@ -34,11 +34,6 @@ public class GenreFilmDbStorage implements GenreFilmStorage {
             LEFT JOIN movie_genre mg ON m.id = mg.movie_id
             WHERE mg.genre_id = ?
             """;
-    private static final String CHECK_GENRES = """
-            SELECT genre_type
-            FROM genre AS mg
-            WHERE genre_type IN (?)
-            """;
 
     public GenreFilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
