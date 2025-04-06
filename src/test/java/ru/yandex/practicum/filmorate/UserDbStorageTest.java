@@ -87,7 +87,7 @@ public class UserDbStorageTest {
 
     @Test
     void testUpdateUserNotFound() {
-        User existingUser  = new User(
+        User existingUser = new User(
                 1L,
                 "existinglogin",
                 "ExistingUser ",
@@ -96,8 +96,8 @@ public class UserDbStorageTest {
                 new ArrayList<>()
         );
 
-        userDbStorage.create(existingUser );
-        User originalUser  = userDbStorage.getUser(1L);
+        userDbStorage.create(existingUser);
+        User originalUser = userDbStorage.getUser(1L);
 
         User userToUpdate = new User(
                 999L,
@@ -109,14 +109,13 @@ public class UserDbStorageTest {
         );
 
         userDbStorage.update(userToUpdate);
-        User updatedUser  = userDbStorage.getUser(1L);
+        User updatedUser = userDbStorage.getUser(1L);
 
         assertEquals(originalUser.getLogin(), updatedUser.getLogin());
         assertEquals(originalUser.getName(), updatedUser.getName());
         assertEquals(originalUser.getEmail(), updatedUser.getEmail());
         assertEquals(originalUser.getBirthday(), updatedUser.getBirthday());
     }
-
 
 
     @Test
