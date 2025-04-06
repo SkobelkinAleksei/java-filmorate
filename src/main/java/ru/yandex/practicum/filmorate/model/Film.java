@@ -43,4 +43,15 @@ public class Film {
     private List<Long> userLikes;
     private Set<GenreFilm> genres;
     private Mpa mpa;
+
+    // Добавляем конструктор, который принимает все необходимые поля:
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, Set<GenreFilm> genres, Mpa mpa) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.genres = genres;
+        this.mpa = mpa;
+    }
 }

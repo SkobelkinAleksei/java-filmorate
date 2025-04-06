@@ -120,12 +120,12 @@ public class FilmDbStorage implements FilmStorage {
 
     private Set<GenreFilm> getGenresByFilmId(Long filmId) {
         String sql = """
-        SELECT g.genre_id, g.genre_type
-        FROM genre g
-        JOIN movie_genre mg ON g.genre_id = mg.genre_id
-        WHERE mg.movie_id = ?
-        ORDER BY g.genre_id ASC;
-        """;
+    SELECT g.genre_id, g.genre_type
+    FROM genre g
+    JOIN movie_genre mg ON g.genre_id = mg.genre_id
+    WHERE mg.movie_id = ?
+    ORDER BY g.genre_id ASC;
+    """;
         return new LinkedHashSet<>(jdbcTemplate.query(sql, (rs, rowNum) ->
                 new GenreFilm(rs.getLong("genre_id"), rs.getString("genre_type")), filmId));
     }
@@ -163,7 +163,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) throws ValidationException {
-        // Проверка на уникальность имени
+        // Проверка на уникальность имени фильма
         String sqlCheckName = "SELECT COUNT(*) FROM movies WHERE name = ?";
         Integer count = jdbcTemplate.queryForObject(sqlCheckName, Integer.class, film.getName());
 
@@ -171,6 +171,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new ValidationException("Film with the name '" + film.getName() + "' already exists.");
         }
 
+        // Вставка фильма в базу данных
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(INSERT_MOVIE, Statement.RETURN_GENERATED_KEYS);
@@ -181,8 +182,11 @@ public class FilmDbStorage implements FilmStorage {
             ps.setLong(5, film.getMpa().getId());
             return ps;
         }, keyHolder);
+
+        // Получаем сгенерированный ID для нового фильма
         film.setId(keyHolder.getKey().longValue());
 
+        // Добавление жанров для фильма
         saveGenres(film);
 
         return film;
@@ -190,9 +194,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film newFilm) {
+        // Обновление фильма
         jdbcTemplate.update(UPDATE_MOVIE, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
+
+        // Удаление старых жанров
         jdbcTemplate.update("DELETE FROM movie_genre WHERE movie_id = ?", newFilm.getId());
+
+        // Сохранение новых жанров
         saveGenres(newFilm);
+
         return newFilm;
     }
 
@@ -201,6 +211,7 @@ public class FilmDbStorage implements FilmStorage {
             String sql = "INSERT INTO movie_genre (movie_id, genre_id) VALUES (?, ?)";
             Set<Long> seen = new HashSet<>();
 
+            // Вставляем жанры в таблицу movie_genre
             for (GenreFilm genre : film.getGenres()) {
                 if (seen.add(genre.getId())) {
                     jdbcTemplate.update(sql, film.getId(), genre.getId());
