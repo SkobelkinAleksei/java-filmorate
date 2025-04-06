@@ -113,10 +113,6 @@ public class UserDbStorage implements UserStorage {
                         getFriendsId(rs.getLong("id"))
                 ), userId);
 
-        if(query.isEmpty()) {
-            return null;
-        }
-
         return query.getFirst();
     }
 
