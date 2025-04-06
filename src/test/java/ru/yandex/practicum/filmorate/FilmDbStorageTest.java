@@ -124,6 +124,7 @@ public class FilmDbStorageTest {
         filmDbStorage.addLike(filmId.getId(), userId);
         assertThat(filmDbStorage.getFilm(filmId.getId())).isNotEmpty();
     }
+
     @Test
     void testRemoveLike() {
         User user = userDbStorage.create(userCreate);
