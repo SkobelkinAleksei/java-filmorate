@@ -67,9 +67,8 @@ public class UserDbStorageTest {
         try {
             userId = userDbStorage.getUser(999L);
         } catch (NoSuchElementException e) {
+            assertThat(userId).isNull();
         }
-
-        assertThat(userId).isNull();
     }
 
     @Test
@@ -112,10 +111,10 @@ public class UserDbStorageTest {
         userDbStorage.update(userToUpdate);
         User updatedUser  = userDbStorage.getUser(1L);
 
-        assertEquals(originalUser .getLogin(), updatedUser .getLogin());
-        assertEquals(originalUser .getName(), updatedUser .getName());
-        assertEquals(originalUser .getEmail(), updatedUser .getEmail());
-        assertEquals(originalUser .getBirthday(), updatedUser .getBirthday());
+        assertEquals(originalUser.getLogin(), updatedUser.getLogin());
+        assertEquals(originalUser.getName(), updatedUser.getName());
+        assertEquals(originalUser.getEmail(), updatedUser.getEmail());
+        assertEquals(originalUser.getBirthday(), updatedUser.getBirthday());
     }
 
 

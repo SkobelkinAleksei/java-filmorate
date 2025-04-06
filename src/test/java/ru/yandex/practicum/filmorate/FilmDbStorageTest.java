@@ -58,16 +58,16 @@ public class FilmDbStorageTest {
         userCreate = new User(
                 null,
                 "TestUser ",
-                "testlogin",
                 "test@example.com",
+                "testlogin",
                 LocalDate.of(1990, 1, 1),
                 new ArrayList<>()
         );
         userCreate2 = new User(
                 null,
                 "TestUser 2",
-                "testlogin2",
                 "test2@example.com",
+                "testlogin2",
                 LocalDate.of(1990, 1, 1),
                 new ArrayList<>()
         );
