@@ -1,14 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.storage.film.GenreFilm;
+import ru.yandex.practicum.filmorate.storage.film.Mpa;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Builder
 @Data
 public class Film {
@@ -21,10 +26,32 @@ public class Film {
     private String description;
 
     @NotNull(message = "Дата релиза фильма не может быть пуста или null")
+    @Past
     private LocalDate releaseDate;
 
-    @NotNull(message = "Продолжительность фильма не может быть пуста или null")
-    private int duration;
 
-    private Set<Long> userLikes;
+    @AssertTrue(message = "Дата должна быть после 28 декабря 1895")
+    public boolean isValidDate() {
+        LocalDate minDate = LocalDate.of(1895, 12, 28);
+        return releaseDate != null && releaseDate.isAfter(minDate);
+    }
+
+    @NotNull(message = "Продолжительность фильма не может быть пуста или null")
+    @Min(1)
+    private Integer duration;
+
+    private List<Long> userLikes;
+    private Set<GenreFilm> genres;
+    private Mpa mpa;
+
+    // Добавляем конструктор, который принимает все необходимые поля:
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, Set<GenreFilm> genres, Mpa mpa) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.genres = genres;
+        this.mpa = mpa;
+    }
 }

@@ -4,26 +4,21 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public interface UserStorage {
     Collection<User> findAll();
 
-    User getUser(long userId);
+    User getUser(Long userId);
 
     User create(User user);
 
-    long getNextId();
-
-    void duplMailCheck(User user);
-
     User update(User newUser);
 
-    Set<User> getFriends(long userId);
+    List<User> getFriends(Long userId);
 
-    boolean addFriend(long userId, long friendId);
+    void addFriend(Long userId, Long friendId);
 
-    boolean removeFriend(long userId, long friendId);
+    void removeFriend(Long userId, Long friendId);
 
     List<User> getMutualFriends(Long user1, Long user2);
 }

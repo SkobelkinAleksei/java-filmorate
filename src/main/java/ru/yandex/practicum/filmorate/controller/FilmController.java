@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
 import java.util.Collection;
 
 @Slf4j
@@ -18,7 +17,7 @@ import java.util.Collection;
 public class FilmController {
     private final FilmService filmService;
 
-    // Получение всех фильмов.
+    // Получение всех фильмов
     @GetMapping
     public Collection<Film> findAll() {
         return filmService.findAll();
@@ -26,6 +25,7 @@ public class FilmController {
 
     // Получение фильма
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Film getFilm(@PathVariable long id) throws NotFoundException {
         return filmService.getFilm(id);
     }
@@ -33,7 +33,7 @@ public class FilmController {
     // Добавляем фильм
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@RequestBody Film film) {
+    public Film createFilm(@RequestBody @Valid Film film) {
         return filmService.createFilm(film);
     }
 
@@ -45,18 +45,18 @@ public class FilmController {
 
     // Ставим лайк фильму
     @PutMapping("/{filmId}/like/{userId}")
-    public boolean addLike(@PathVariable Long filmId, @PathVariable Long userId) throws NotFoundException {
-        return filmService.addLike(filmId, userId);
+    public void addLike(@PathVariable long filmId, @PathVariable Long userId) throws NotFoundException {
+        filmService.addLike(filmId, userId);
     }
 
     //  пользователь удаляет лайк
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{filmId}/like/{userId}")
-    public boolean removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
-        return filmService.removeLike(filmId, userId);
+    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        filmService.removeLike(filmId, userId);
     }
 
-    // Возвращает список из первых 10-и
+    // Возвращает список из первых 5-и
     @GetMapping("/popular")
     public Collection<Film> getTopMovies() throws NotFoundException {
         return filmService.getTopMovies();

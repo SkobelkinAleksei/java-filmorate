@@ -1,25 +1,24 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import jakarta.validation.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface FilmStorage {
 
     Collection<Film> findAll();
 
-    boolean addLike(Long filmId, Long userId);
+    void addLike(Long filmId, Long userId);
 
-    boolean removeLike(Long filmId, Long userId);
+    void removeLike(Long filmId, Long userId);
 
     Collection<Film> getTopMovies();
 
-    Film getFilm(Long filmId);
+    Optional<Film> getFilm(Long filmId);
 
     Film createFilm(Film film) throws ValidationException;
 
     Film update(Film newFilm);
-
-    long getNextId();
 }

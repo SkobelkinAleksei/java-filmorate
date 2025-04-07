@@ -1,16 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
+import jakarta.validation.constraints.Past;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
+@Getter
+@Setter
 @Data
 public class User {
     private Long id;
@@ -26,7 +32,11 @@ public class User {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Др не может быть пустым или null")
+    @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    private Set<Long> friendIds;
+    private List<Long> friendIds;
+
+
+
 }
