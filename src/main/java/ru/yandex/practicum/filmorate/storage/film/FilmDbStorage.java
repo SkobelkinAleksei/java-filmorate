@@ -194,6 +194,12 @@ public class FilmDbStorage implements FilmStorage {
                 newFilm.getDuration(),
                 newFilm.getMpa().getId(),
                 newFilm.getId());
+
+        // Удаление старых жанров
+        jdbcTemplate.update("DELETE FROM movie_genre WHERE movie_id = ?",
+                newFilm.getId());
+
+        // Сохранение новых жанров
         saveGenres(newFilm);
 
         return newFilm;
