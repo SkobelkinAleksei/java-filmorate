@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS movie_rating
 CREATE TABLE IF NOT EXISTS movies
 (
     id          BIGINT       NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name        VARCHAR(200) NOT NULL UNIQUE,
+    name        VARCHAR(200) NOT NULL,
     description VARCHAR(200),
     releaseDate DATE         NOT NULL,
     duration    INT          NOT NULL,

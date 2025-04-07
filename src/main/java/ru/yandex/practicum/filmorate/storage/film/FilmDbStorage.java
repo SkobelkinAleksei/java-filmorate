@@ -163,14 +163,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) throws ValidationException {
-        // Проверка на уникальность имени фильма
-        String sqlCheckName = "SELECT COUNT(*) FROM movies WHERE name = ?";
-        Integer count = jdbcTemplate.queryForObject(sqlCheckName, Integer.class, film.getName());
-
-        if (count != null && count > 0) {
-            throw new ValidationException("Film with the name '" + film.getName() + "' already exists.");
-        }
-
         // Вставка фильма в базу данных
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -195,12 +187,13 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film update(Film newFilm) {
         // Обновление фильма
-        jdbcTemplate.update(UPDATE_MOVIE, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
-
-        // Удаление старых жанров
-        jdbcTemplate.update("DELETE FROM movie_genre WHERE movie_id = ?", newFilm.getId());
-
-        // Сохранение новых жанров
+        jdbcTemplate.update(UPDATE_MOVIE,
+                newFilm.getName(),
+                newFilm.getDescription(),
+                newFilm.getReleaseDate(),
+                newFilm.getDuration(),
+                newFilm.getMpa().getId(),
+                newFilm.getId());
         saveGenres(newFilm);
 
         return newFilm;
