@@ -162,7 +162,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) throws ValidationException {
-        if(film.getName() == null || film.getName().isEmpty()) {
+        if (film.getName() == null || film.getName().isEmpty()) {
             throw new ValidationException("Film name cannot be empty");
         }
         // Вставка фильма в базу данных
