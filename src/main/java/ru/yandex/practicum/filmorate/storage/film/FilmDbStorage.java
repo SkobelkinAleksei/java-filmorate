@@ -27,25 +27,24 @@ public class FilmDbStorage implements FilmStorage {
             LEFT JOIN movie_rating AS m ON f.mpa_id = m.id;
             """;
     private static final String FIND_MOVIE_BY_ID = """
-             SELECT f.id,
-                   f.name,
-                   f.description,
-                   f.releaseDate,
-                   f.duration,
-                   GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
-                   GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
-                   r.id AS rating_id,
-                   r.mpa AS rating_name,
-                   mg.movie_id, mg.genre_id,
-                   g.genre_id, g.genre_type,
-                   GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
-            FROM movies AS f
-                     LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
-                     LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
-                     LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
-                     LEFT JOIN user_likes AS l ON f.id = l.movie_id
-            WHERE f.id = ?
-            GROUP BY f.id, f.name, f.description, f.releaseDate, f.duration, r.id, r.mpa;
+            SELECT
+                 f.id,
+                 f.name,
+                 f.description,
+                 f.releaseDate,
+                 f.duration,
+                 GROUP_CONCAT(DISTINCT g.genre_id) AS genre_ids,
+                 GROUP_CONCAT(DISTINCT g.genre_type) AS genre_names,
+                 r.id AS rating_id,
+                 r.mpa AS rating_name,
+                 GROUP_CONCAT(DISTINCT l.user_id) AS like_ids
+             FROM movies AS f
+             LEFT JOIN movie_genre AS mg ON f.id = mg.movie_id
+             LEFT JOIN genre AS g ON mg.genre_id = g.genre_id
+             LEFT JOIN movie_rating AS r ON f.mpa_id = r.id
+             LEFT JOIN user_likes AS l ON f.id = l.movie_id
+             WHERE f.id = ?
+             GROUP BY f.id, r.id, r.mpa;
             """;
 
     private static final String INSERT_MOVIE = """
@@ -163,6 +162,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) throws ValidationException {
+        if(film.getName() == null || film.getName().isEmpty()) {
+            throw new ValidationException("Film name cannot be empty");
+        }
         // Вставка фильма в базу данных
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
